@@ -16,6 +16,7 @@ add_subdirectory(src/asn/ngap)
 add_subdirectory(src/lib)
 add_subdirectory(src/gnb)
 add_subdirectory(src/ue)
+add_subdirectory(src/rgnb)
 
 #################### GNB EXECUTABLE ####################
 
@@ -29,6 +30,21 @@ target_link_libraries(nr-gnb asn-rrc)
 target_link_libraries(nr-gnb asn-ngap)
 target_link_libraries(nr-gnb common-lib)
 target_link_libraries(nr-gnb gnb)
+
+#################### RGNB EXECUTABLE ###################
+
+add_executable(nr-rgnb src/rgnb.cpp
+        src/rgnb.cpp
+        src/rgnb.cpp)
+
+target_link_libraries(nr-rgnb pthread)
+
+target_compile_options(nr-rgnb PRIVATE -Wall -Wextra -pedantic)
+
+target_link_libraries(nr-rgnb asn-rrc)
+target_link_libraries(nr-rgnb asn-ngap)
+target_link_libraries(nr-rgnb common-lib)
+target_link_libraries(nr-rgnb rgnb)
 
 #################### UE EXECUTABLE ####################
 
