@@ -35,8 +35,8 @@ class UeRlsTask : public NtsTask
     std::unique_ptr<Logger> m_logger;
 
     RlsSharedContext* m_shCtx;
-    RlsUdpTask *m_udpTask;
-    RlsControlTask *m_ctlTask;
+    UeRlsUdpTask *m_udpTask;
+    UeRlsControlTask *m_ctlTask;
 
     friend class UeCmdHandler;
 

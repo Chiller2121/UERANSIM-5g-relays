@@ -110,7 +110,7 @@ class SctpHandler : public sctp::ISctpHandler
 
 SctpTask::SctpTask(TaskBase *base) : m_base{base}, m_clients{}
 {
-    m_logger = base->logBase->makeUniqueLogger("sctp");
+    m_logger = base->logBase->makeUniqueLogger("gnbSctp");
 }
 
 void SctpTask::onStart()

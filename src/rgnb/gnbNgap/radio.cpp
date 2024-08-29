@@ -24,7 +24,7 @@ void NgapTask::handleRadioLinkFailure(int ueId)
     // Notify GTP task
     auto w = std::make_unique<NmGnbNgapToGtp>(NmGnbNgapToGtp::UE_CONTEXT_RELEASE);
     w->ueId = ueId;
-    m_base->gtpTask->push(std::move(w));
+    m_base->gnbGtpTask->push(std::move(w));
 
     // Notify AMF
     sendContextRelease(ueId, NgapCause::RadioNetwork_radio_connection_with_ue_lost);
@@ -53,7 +53,7 @@ void NgapTask::receivePaging(int amfId, ASN_NGAP_Paging *msg)
         asn::UniqueCopy(*ieUePagingIdentity->UEPagingIdentity.choice.fiveG_S_TMSI, asn_DEF_ASN_NGAP_FiveG_S_TMSI);
     w->taiListForPaging = asn::UniqueCopy(ieTaiListForPaging->TAIListForPaging, asn_DEF_ASN_NGAP_TAIListForPaging);
 
-    m_base->rrcTask->push(std::move(w));
+    m_base->gnbRrcTask->push(std::move(w));
 }
 
 } // namespace nr::rgnb

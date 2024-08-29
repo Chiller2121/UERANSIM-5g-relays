@@ -48,7 +48,7 @@ RlsUdpTask::RlsUdpTask(TaskBase *base, uint64_t sti, Vector3 phyLocation)
 
     try
     {
-        m_server = new udp::UdpServer(base->config->linkIp, cons::RadioLinkPort);
+        m_server = new udp::UdpServer(base->gnbConfig->linkIp, cons::RadioLinkPort);
     }
     catch (const LibError &e)
     {

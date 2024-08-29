@@ -20,7 +20,7 @@
 namespace nr::rgnb
 {
 
-class RlsUdpTask : public NtsTask
+class UeRlsUdpTask : public NtsTask
 {
   private:
     struct CellInfo
@@ -46,8 +46,8 @@ class RlsUdpTask : public NtsTask
     friend class UeCmdHandler;
 
   public:
-    explicit RlsUdpTask(TaskBase *base, RlsSharedContext* shCtx, const std::vector<std::string> &searchSpace);
-    ~RlsUdpTask() override = default;
+    explicit UeRlsUdpTask(TaskBase *base, RlsSharedContext* shCtx, const std::vector<std::string> &searchSpace);
+    ~UeRlsUdpTask() override = default;
 
   protected:
     void onStart() override;

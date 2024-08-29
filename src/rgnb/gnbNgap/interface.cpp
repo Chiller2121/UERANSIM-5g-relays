@@ -101,33 +101,40 @@ void NgapTask::handleAssociationShutdown(int amfId)
 
     auto w = std::make_unique<NmGnbSctp>(NmGnbSctp::CONNECTION_CLOSE);
     w->clientId = amfId;
-    m_base->sctpTask->push(std::move(w));
+    m_base->gnbSctpTask->push(std::move(w));
 
     deleteAmfContext(amfId);
 }
 
 void NgapTask::sendNgSetupRequest(int amfId)
 {
+    // Logging
     m_logger->debug("Sending NG Setup Request");
 
+    // Using the current AMF
     auto *amf = findAmfContext(amfId);
     if (amf == nullptr)
         return;
 
+    // Set AMF state
     amf->state = EAmfState::WAITING_NG_SETUP;
 
     // TODO: this procedure also re-initialises the NGAP UE-related contexts (if any)
     //  and erases all related signalling connections in the two nodes like an NG Reset procedure would do.
     //  More on 38.413 8.7.1.1
 
+    // New ASN NGAP global GNB ID object
     auto *globalGnbId = asn::New<ASN_NGAP_GlobalGNB_ID>();
     globalGnbId->gNB_ID.present = ASN_NGAP_GNB_ID_PR_gNB_ID;
-    auto gnbIdLength = m_base->config->gnbIdLength;
+    auto gnbIdLength = m_base->gnbConfig->gnbIdLength;
     auto bitsToShift = 32 - gnbIdLength;
-    asn::SetBitString(globalGnbId->gNB_ID.choice.gNB_ID, octet4{m_base->config->getGnbId() << bitsToShift},
+    // sets gnb ID
+    asn::SetBitString(globalGnbId->gNB_ID.choice.gNB_ID, octet4{m_base->gnbConfig->getGnbId() << bitsToShift},
                       static_cast<size_t>(gnbIdLength));
-    asn::SetOctetString3(globalGnbId->pLMNIdentity, ngap_utils::PlmnToOctet3(m_base->config->plmn));
+    // sets PLMN identity
+    asn::SetOctetString3(globalGnbId->pLMNIdentity, ngap_utils::PlmnToOctet3(m_base->gnbConfig->plmn));
 
+    // Information Element: Global GNB ID
     auto *ieGlobalGnbId = asn::New<ASN_NGAP_NGSetupRequestIEs>();
     ieGlobalGnbId->id = ASN_NGAP_ProtocolIE_ID_id_GlobalRANNodeID;
     ieGlobalGnbId->criticality = ASN_NGAP_Criticality_reject;
@@ -135,15 +142,17 @@ void NgapTask::sendNgSetupRequest(int amfId)
     ieGlobalGnbId->value.choice.GlobalRANNodeID.present = ASN_NGAP_GlobalRANNodeID_PR_globalGNB_ID;
     ieGlobalGnbId->value.choice.GlobalRANNodeID.choice.globalGNB_ID = globalGnbId;
 
+    // Information Element: RAN Node Name
     auto *ieRanNodeName = asn::New<ASN_NGAP_NGSetupRequestIEs>();
     ieRanNodeName->id = ASN_NGAP_ProtocolIE_ID_id_RANNodeName;
     ieRanNodeName->criticality = ASN_NGAP_Criticality_ignore;
     ieRanNodeName->value.present = ASN_NGAP_NGSetupRequestIEs__value_PR_RANNodeName;
-    asn::SetPrintableString(ieRanNodeName->value.choice.RANNodeName, m_base->config->name);
+    asn::SetPrintableString(ieRanNodeName->value.choice.RANNodeName, m_base->gnbConfig->name);
 
+    // Broadcast PLMN Item: PLMN (Public Land Mobile Network) + Slices
     auto *broadcastPlmn = asn::New<ASN_NGAP_BroadcastPLMNItem>();
-    asn::SetOctetString3(broadcastPlmn->pLMNIdentity, ngap_utils::PlmnToOctet3(m_base->config->plmn));
-    for (auto &nssai : m_base->config->nssai.slices)
+    asn::SetOctetString3(broadcastPlmn->pLMNIdentity, ngap_utils::PlmnToOctet3(m_base->gnbConfig->plmn));
+    for (auto &nssai : m_base->gnbConfig->nssai.slices)
     {
         auto *item = asn::New<ASN_NGAP_SliceSupportItem>();
         asn::SetOctetString1(item->s_NSSAI.sST, static_cast<uint8_t>(nssai.sst));
@@ -155,22 +164,26 @@ void NgapTask::sendNgSetupRequest(int amfId)
         asn::SequenceAdd(broadcastPlmn->tAISliceSupportList, item);
     }
 
+    // Tracking Area
     auto *supportedTa = asn::New<ASN_NGAP_SupportedTAItem>();
-    asn::SetOctetString3(supportedTa->tAC, octet3{m_base->config->tac});
+    asn::SetOctetString3(supportedTa->tAC, octet3{m_base->gnbConfig->tac});
     asn::SequenceAdd(supportedTa->broadcastPLMNList, broadcastPlmn);
 
+    // Information Element: Supported Tracking Area List
     auto *ieSupportedTaList = asn::New<ASN_NGAP_NGSetupRequestIEs>();
     ieSupportedTaList->id = ASN_NGAP_ProtocolIE_ID_id_SupportedTAList;
     ieSupportedTaList->criticality = ASN_NGAP_Criticality_reject;
     ieSupportedTaList->value.present = ASN_NGAP_NGSetupRequestIEs__value_PR_SupportedTAList;
     asn::SequenceAdd(ieSupportedTaList->value.choice.SupportedTAList, supportedTa);
 
+    // DRX: Discontinous Reception
     auto *iePagingDrx = asn::New<ASN_NGAP_NGSetupRequestIEs>();
     iePagingDrx->id = ASN_NGAP_ProtocolIE_ID_id_DefaultPagingDRX;
     iePagingDrx->criticality = ASN_NGAP_Criticality_ignore;
     iePagingDrx->value.present = ASN_NGAP_NGSetupRequestIEs__value_PR_PagingDRX;
-    iePagingDrx->value.choice.PagingDRX = ngap_utils::PagingDrxToAsn(m_base->config->pagingDrx);
+    iePagingDrx->value.choice.PagingDRX = ngap_utils::PagingDrxToAsn(m_base->gnbConfig->pagingDrx);
 
+    // Create NG Setup Request PDU out of all previous Elements
     auto *pdu = asn::ngap::NewMessagePdu<ASN_NGAP_NGSetupRequest>(
         {ieGlobalGnbId, ieRanNodeName, ieSupportedTaList, iePagingDrx});
 
@@ -197,9 +210,9 @@ void NgapTask::receiveNgSetupResponse(int amfId, ASN_NGAP_NGSetupResponse *msg)
 
         auto update = std::make_unique<NmGnbStatusUpdate>(NmGnbStatusUpdate::NGAP_IS_UP);
         update->isNgapUp = true;
-        m_base->appTask->push(std::move(update));
+        m_base->gnbAppTask->push(std::move(update));
 
-        m_base->rrcTask->push(std::make_unique<NmGnbNgapToRrc>(NmGnbNgapToRrc::RADIO_POWER_ON));
+        m_base->gnbRrcTask->push(std::make_unique<NmGnbNgapToRrc>(NmGnbNgapToRrc::RADIO_POWER_ON));
     }
 }
 

@@ -18,12 +18,12 @@ namespace nr::rgnb
 
 NgapTask::NgapTask(TaskBase *base) : m_base{base}, m_ueNgapIdCounter{}, m_downlinkTeidCounter{}, m_isInitialized{}
 {
-    m_logger = base->logBase->makeUniqueLogger("ngap");
+    m_logger = base->logBase->makeUniqueLogger("gnbNgap");
 }
 
 void NgapTask::onStart()
 {
-    for (auto &amfConfig : m_base->config->amfConfigs)
+    for (auto &amfConfig : m_base->gnbConfig->amfConfigs)
         createAmfContext(amfConfig);
     if (m_amfCtx.empty())
         m_logger->warn("No AMF configuration is provided");
@@ -32,13 +32,13 @@ void NgapTask::onStart()
     {
         auto msg = std::make_unique<NmGnbSctp>(NmGnbSctp::CONNECTION_REQUEST);
         msg->clientId = amfCtx.second->ctxId;
-        msg->localAddress = m_base->config->ngapIp;
+        msg->localAddress = m_base->gnbConfig->ngapIp;
         msg->localPort = 0;
         msg->remoteAddress = amfCtx.second->address;
         msg->remotePort = amfCtx.second->port;
         msg->ppid = sctp::PayloadProtocolId::NGAP;
         msg->associatedTask = this;
-        m_base->sctpTask->push(std::move(msg));
+        m_base->gnbSctpTask->push(std::move(msg));
     }
 }
 

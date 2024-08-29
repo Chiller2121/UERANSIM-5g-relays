@@ -18,6 +18,8 @@
 #include <lib/rls/rls_base.hpp>
 #include <lib/rrc/rrc.hpp>
 #include <lib/sctp/sctp.hpp>
+
+#include <utils/light_sync.hpp>
 #include <utils/network.hpp>
 #include <utils/nts.hpp>
 #include <utils/octet_string.hpp>

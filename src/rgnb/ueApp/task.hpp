@@ -30,7 +30,7 @@ class UeAppTask : public NtsTask
     std::array<TunTask *, 16> m_tunTasks{};
     ECmState m_cmState{};
 
-    friend class UeCmdHandler;
+//    friend class UeCmdHandler;
 
   public:
     explicit UeAppTask(TaskBase *base);

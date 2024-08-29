@@ -113,7 +113,7 @@ void NasSm::sendEstablishmentRequest(const SessionConfig &config)
     auto req = std::make_unique<nas::PduSessionEstablishmentRequest>();
     req->pti = pti;
     req->pduSessionId = psi;
-    req->integrityProtectionMaximumDataRate = MakeIntegrityMaxRate(m_base->config->integrityMaxRate);
+    req->integrityProtectionMaximumDataRate = MakeIntegrityMaxRate(m_base->ueConfig->integrityMaxRate);
     req->pduSessionType = nas::IEPduSessionType{};
     req->pduSessionType->pduSessionType = nas::EPduSessionType::IPV4;
     req->sscMode = nas::IESscMode{};
@@ -172,7 +172,7 @@ void NasSm::receiveEstablishmentAccept(const nas::PduSessionEstablishmentAccept 
 
     auto statusUpdate = std::make_unique<NmUeStatusUpdate>(NmUeStatusUpdate::SESSION_ESTABLISHMENT);
     statusUpdate->pduSession = pduSession;
-    m_base->appTask->push(std::move(statusUpdate));
+    m_base->ueAppTask->push(std::move(statusUpdate));
 
     m_logger->info("PDU Session establishment is successful PSI[%d]", pduSession->psi);
 }

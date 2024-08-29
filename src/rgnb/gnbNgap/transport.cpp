@@ -113,14 +113,14 @@ void NgapTask::sendNgapNonUe(int associatedAmf, ASN_NGAP_NGAP_PDU *pdu)
         msg->clientId = amf->ctxId;
         msg->stream = 0;
         msg->buffer = UniqueBuffer{buffer, static_cast<size_t>(encoded)};
-        m_base->sctpTask->push(std::move(msg));
+        m_base->gnbSctpTask->push(std::move(msg));
 
         if (m_base->nodeListener)
         {
             std::string xer = ngap_encode::EncodeXer(asn_DEF_ASN_NGAP_NGAP_PDU, pdu);
             if (xer.length() > 0)
             {
-                m_base->nodeListener->onSend(app::NodeType::GNB, m_base->config->name, app::NodeType::AMF, amf->amfName,
+                m_base->nodeListener->onSend(app::NodeType::GNB, m_base->gnbConfig->name, app::NodeType::AMF, amf->amfName,
                                              app::ConnectionType::NGAP, xer);
             }
         }
@@ -174,10 +174,10 @@ void NgapTask::sendNgapUeAssociated(int ueId, ASN_NGAP_NGAP_PDU *pdu)
                 auto &nr = loc->choice.userLocationInformationNR;
                 nr->timeStamp = asn::New<ASN_NGAP_TimeStamp_t>();
 
-                ngap_utils::ToPlmnAsn_Ref(m_base->config->plmn, nr->nR_CGI.pLMNIdentity);
-                asn::SetBitStringLong<36>(m_base->config->nci, nr->nR_CGI.nRCellIdentity);
-                ngap_utils::ToPlmnAsn_Ref(m_base->config->plmn, nr->tAI.pLMNIdentity);
-                asn::SetOctetString3(nr->tAI.tAC, octet3{m_base->config->tac});
+                ngap_utils::ToPlmnAsn_Ref(m_base->gnbConfig->plmn, nr->nR_CGI.pLMNIdentity);
+                asn::SetBitStringLong<36>(m_base->gnbConfig->nci, nr->nR_CGI.nRCellIdentity);
+                ngap_utils::ToPlmnAsn_Ref(m_base->gnbConfig->plmn, nr->tAI.pLMNIdentity);
+                asn::SetOctetString3(nr->tAI.tAC, octet3{m_base->gnbConfig->tac});
                 asn::SetOctetString4(*nr->timeStamp, octet4{utils::CurrentTimeStamp().seconds32()});
             });
     }
@@ -204,14 +204,14 @@ void NgapTask::sendNgapUeAssociated(int ueId, ASN_NGAP_NGAP_PDU *pdu)
         msg->clientId = amf->ctxId;
         msg->stream = ue->uplinkStream;
         msg->buffer = UniqueBuffer{buffer, static_cast<size_t>(encoded)};
-        m_base->sctpTask->push(std::move(msg));
+        m_base->gnbSctpTask->push(std::move(msg));
 
         if (m_base->nodeListener)
         {
             std::string xer = ngap_encode::EncodeXer(asn_DEF_ASN_NGAP_NGAP_PDU, pdu);
             if (xer.length() > 0)
             {
-                m_base->nodeListener->onSend(app::NodeType::GNB, m_base->config->name, app::NodeType::AMF, amf->amfName,
+                m_base->nodeListener->onSend(app::NodeType::GNB, m_base->gnbConfig->name, app::NodeType::AMF, amf->amfName,
                                              app::ConnectionType::NGAP, xer);
             }
         }
@@ -240,7 +240,7 @@ void NgapTask::handleSctpMessage(int amfId, uint16_t stream, const UniqueBuffer 
         std::string xer = ngap_encode::EncodeXer(asn_DEF_ASN_NGAP_NGAP_PDU, pdu);
         if (xer.length() > 0)
         {
-            m_base->nodeListener->onReceive(app::NodeType::GNB, m_base->config->name, app::NodeType::AMF, amf->amfName,
+            m_base->nodeListener->onReceive(app::NodeType::GNB, m_base->gnbConfig->name, app::NodeType::AMF, amf->amfName,
                                             app::ConnectionType::NGAP, xer);
         }
     }
@@ -333,7 +333,7 @@ void NgapTask::handleSctpMessage(int amfId, uint16_t stream, const UniqueBuffer 
 
 bool NgapTask::handleSctpStreamId(int amfId, int stream, const ASN_NGAP_NGAP_PDU &pdu)
 {
-    if (m_base->config->ignoreStreamIds)
+    if (m_base->gnbConfig->ignoreStreamIds)
         return true;
 
     auto *ptr =

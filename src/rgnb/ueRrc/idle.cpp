@@ -105,11 +105,11 @@ void UeRrcTask::performCellSelection()
     {
         auto w1 = std::make_unique<NmUeRrcToRls>(NmUeRrcToRls::ASSIGN_CURRENT_CELL);
         w1->cellId = selectedCell;
-        m_base->rlsTask->push(std::move(w1));
+        m_base->ueRlsTask->push(std::move(w1));
 
         auto w2 = std::make_unique<NmUeRrcToNas>(NmUeRrcToNas::ACTIVE_CELL_CHANGED);
         w2->previousTai = Tai{lastCell.plmn, lastCell.tac};
-        m_base->nasTask->push(std::move(w2));
+        m_base->ueNasTask->push(std::move(w2));
     }
 }
 

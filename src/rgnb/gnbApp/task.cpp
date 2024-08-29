@@ -16,7 +16,7 @@ namespace nr::rgnb
 
 GnbAppTask::GnbAppTask(TaskBase *base) : m_base{base}, m_statusInfo{}
 {
-    m_logger = m_base->logBase->makeUniqueLogger("app");
+    m_logger = m_base->logBase->makeUniqueLogger("gnbApp");
 }
 
 void GnbAppTask::onStart()
@@ -41,12 +41,12 @@ void GnbAppTask::onLoop()
         }
         break;
     }
-    case NtsMessageType::GNB_CLI_COMMAND: {
-        auto& w = dynamic_cast<NmGnbCliCommand &>(*msg);
-        GnbCmdHandler handler{m_base};
-        handler.handleCmd(w);
-        break;
-    }
+//    case NtsMessageType::GNB_CLI_COMMAND: {
+//        auto& w = dynamic_cast<NmGnbCliCommand &>(*msg);
+//        GnbCmdHandler handler{m_base};
+//        handler.handleCmd(w);
+//        break;
+//    }
     default:
         m_logger->unhandledNts(*msg);
         break;

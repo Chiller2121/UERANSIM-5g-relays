@@ -22,25 +22,25 @@ static constexpr const int TIMER_PERIOD_ACK_SEND = 2250;
 namespace nr::rgnb
 {
 
-RlsControlTask::RlsControlTask(TaskBase *base, RlsSharedContext *shCtx)
+UeRlsControlTask::UeRlsControlTask(TaskBase *base, RlsSharedContext *shCtx)
     : m_shCtx{shCtx}, m_servingCell{}, m_mainTask{}, m_udpTask{}, m_pduMap{}, m_pendingAck{}
 {
-    m_logger = base->logBase->makeUniqueLogger(base->config->getLoggerPrefix() + "rls-ctl");
+    m_logger = base->logBase->makeUniqueLogger(base->ueConfig->getLoggerPrefix() + "rls-ctl");
 }
 
-void RlsControlTask::initialize(NtsTask *mainTask, RlsUdpTask *udpTask)
+void UeRlsControlTask::initialize(NtsTask *mainTask, UeRlsUdpTask *udpTask)
 {
     m_mainTask = mainTask;
     m_udpTask = udpTask;
 }
 
-void RlsControlTask::onStart()
+void UeRlsControlTask::onStart()
 {
     setTimer(TIMER_ID_ACK_CONTROL, TIMER_PERIOD_ACK_CONTROL);
     setTimer(TIMER_ID_ACK_SEND, TIMER_PERIOD_ACK_SEND);
 }
 
-void RlsControlTask::onLoop()
+void UeRlsControlTask::onLoop()
 {
     auto msg = take();
     if (!msg)
@@ -93,11 +93,11 @@ void RlsControlTask::onLoop()
     }
 }
 
-void RlsControlTask::onQuit()
+void UeRlsControlTask::onQuit()
 {
 }
 
-void RlsControlTask::handleRlsMessage(int cellId, rls::RlsMessage &msg)
+void UeRlsControlTask::handleRlsMessage(int cellId, rls::RlsMessage &msg)
 {
     if (msg.msgType == rls::EMessageType::PDU_TRANSMISSION_ACK)
     {
@@ -144,7 +144,7 @@ void RlsControlTask::handleRlsMessage(int cellId, rls::RlsMessage &msg)
     }
 }
 
-void RlsControlTask::handleSignalChange(int cellId, int dbm)
+void UeRlsControlTask::handleSignalChange(int cellId, int dbm)
 {
     auto w = std::make_unique<NmUeRlsToRls>(NmUeRlsToRls::SIGNAL_CHANGED);
     w->cellId = cellId;
@@ -152,7 +152,7 @@ void RlsControlTask::handleSignalChange(int cellId, int dbm)
     m_mainTask->push(std::move(w));
 }
 
-void RlsControlTask::handleUplinkRrcDelivery(int cellId, uint32_t pduId, rrc::RrcChannel channel, OctetString &&data)
+void UeRlsControlTask::handleUplinkRrcDelivery(int cellId, uint32_t pduId, rrc::RrcChannel channel, OctetString &&data)
 {
     if (pduId != 0)
     {
@@ -192,7 +192,7 @@ void RlsControlTask::handleUplinkRrcDelivery(int cellId, uint32_t pduId, rrc::Rr
     m_udpTask->send(cellId, msg);
 }
 
-void RlsControlTask::handleUplinkDataDelivery(int psi, OctetString &&data)
+void UeRlsControlTask::handleUplinkDataDelivery(int psi, OctetString &&data)
 {
     rls::RlsPduTransmission msg{m_shCtx->sti};
     msg.pduType = rls::EPduType::DATA;
@@ -203,7 +203,7 @@ void RlsControlTask::handleUplinkDataDelivery(int psi, OctetString &&data)
     m_udpTask->send(m_servingCell, msg);
 }
 
-void RlsControlTask::onAckControlTimerExpired()
+void UeRlsControlTask::onAckControlTimerExpired()
 {
     int64_t current = utils::CurrentTimeMillis();
 
@@ -231,7 +231,7 @@ void RlsControlTask::onAckControlTimerExpired()
     }
 }
 
-void RlsControlTask::onAckSendTimerExpired()
+void UeRlsControlTask::onAckSendTimerExpired()
 {
     auto copy = m_pendingAck;
     m_pendingAck.clear();

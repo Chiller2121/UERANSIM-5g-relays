@@ -26,12 +26,12 @@ void NasMm::receiveIdentityRequest(const nas::IdentityRequest &msg)
     else if (msg.identityType.value == nas::EIdentityType::IMEI)
     {
         resp.mobileIdentity.type = nas::EIdentityType::IMEI;
-        resp.mobileIdentity.value = *m_base->config->imei;
+        resp.mobileIdentity.value = *m_base->ueConfig->imei;
     }
     else if (msg.identityType.value == nas::EIdentityType::IMEISV)
     {
         resp.mobileIdentity.type = nas::EIdentityType::IMEISV;
-        resp.mobileIdentity.value = *m_base->config->imeiSv;
+        resp.mobileIdentity.value = *m_base->ueConfig->imeiSv;
     }
     else if (msg.identityType.value == nas::EIdentityType::GUTI)
     {
@@ -73,11 +73,11 @@ nas::IE5gsMobileIdentity NasMm::getOrGenerateSuci()
 
 nas::IE5gsMobileIdentity NasMm::generateSuci()
 {
-    auto &supi = m_base->config->supi;
-    auto &plmn = m_base->config->hplmn;
-    auto &protectionScheme = m_base->config->protectionScheme;
-    auto &homeNetworkPublicKeyId = m_base->config->homeNetworkPublicKeyId;
-    auto &homeNetworkPublicKey = m_base->config->homeNetworkPublicKey;
+    auto &supi = m_base->ueConfig->supi;
+    auto &plmn = m_base->ueConfig->hplmn;
+    auto &protectionScheme = m_base->ueConfig->protectionScheme;
+    auto &homeNetworkPublicKeyId = m_base->ueConfig->homeNetworkPublicKeyId;
+    auto &homeNetworkPublicKey = m_base->ueConfig->homeNetworkPublicKey;
 
     if (!supi.has_value())
         return {};
@@ -96,9 +96,9 @@ nas::IE5gsMobileIdentity NasMm::generateSuci()
     ret.imsi.plmn.isLongMnc = plmn.isLongMnc;
     ret.imsi.plmn.mcc = plmn.mcc;
     ret.imsi.plmn.mnc = plmn.mnc;
-    if (m_base->config->routingIndicator.has_value())
+    if (m_base->ueConfig->routingIndicator.has_value())
     {
-        ret.imsi.routingIndicator = *m_base->config->routingIndicator;
+        ret.imsi.routingIndicator = *m_base->ueConfig->routingIndicator;
     }
     else
     {
@@ -182,18 +182,18 @@ nas::IE5gsMobileIdentity NasMm::getOrGeneratePreferredId()
     {
         return suci;
     }
-    else if (m_base->config->imei.has_value())
+    else if (m_base->ueConfig->imei.has_value())
     {
         nas::IE5gsMobileIdentity res{};
         res.type = nas::EIdentityType::IMEI;
-        res.value = *m_base->config->imei;
+        res.value = *m_base->ueConfig->imei;
         return res;
     }
-    else if (m_base->config->imeiSv.has_value())
+    else if (m_base->ueConfig->imeiSv.has_value())
     {
         nas::IE5gsMobileIdentity res{};
         res.type = nas::EIdentityType::IMEISV;
-        res.value = *m_base->config->imeiSv;
+        res.value = *m_base->ueConfig->imeiSv;
         return res;
     }
     else

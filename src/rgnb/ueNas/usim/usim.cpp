@@ -11,7 +11,7 @@
 namespace nr::rgnb
 {
 
-void ue::Usim::initialize(bool hasSupi)
+void rgnb::Usim::initialize(bool hasSupi)
 {
     m_isValid = hasSupi;
 

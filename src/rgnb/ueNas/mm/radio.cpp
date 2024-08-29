@@ -77,13 +77,13 @@ void NasMm::performPlmnSelection()
 
     // Highest priority is for HPLMN, so just look for HPLMN first.
     for (auto &plmn : plmns)
-        if (plmn == m_base->config->hplmn)
+        if (plmn == m_base->ueConfig->hplmn)
             candidates.push_back(plmn);
 
     // Then again look for the all PLMNS
     for (auto &plmn : plmns)
     {
-        if (plmn == m_base->config->hplmn)
+        if (plmn == m_base->ueConfig->hplmn)
             continue; // If it's the HPLMN, it's already added above
         if (m_storage->forbiddenPlmnList->contains(plmn))
             continue;
@@ -106,7 +106,7 @@ void NasMm::performPlmnSelection()
     else if (lastSelectedPlmn != selected)
     {
         m_logger->info("Selected plmn[%s]", ToJson(selected).str().c_str());
-        m_base->rrcTask->push(std::make_unique<NmUeNasToRrc>(NmUeNasToRrc::RRC_NOTIFY));
+        m_base->ueRrcTask->push(std::make_unique<NmUeNasToRrc>(NmUeNasToRrc::RRC_NOTIFY));
 
         resetRegAttemptCounter();
     }
@@ -278,7 +278,7 @@ void NasMm::localReleaseConnection(bool treatBarred)
 
     auto w = std::make_unique<NmUeNasToRrc>(NmUeNasToRrc::LOCAL_RELEASE_CONNECTION);
     w->treatBarred = treatBarred;
-    m_base->rrcTask->push(std::move(w));
+    m_base->ueRrcTask->push(std::move(w));
 }
 
 void NasMm::handlePaging(const std::vector<GutiMobileIdentity> &tmsiIds)

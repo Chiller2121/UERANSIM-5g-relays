@@ -19,7 +19,7 @@ namespace nr::rgnb
 
 NasTask::NasTask(TaskBase *base) : base{base}, timers{}
 {
-    logger = base->logBase->makeUniqueLogger(base->config->getLoggerPrefix() + "nas");
+    logger = base->logBase->makeUniqueLogger(base->ueConfig->getLoggerPrefix() + "ueNas");
 
     mm = new NasMm(base, &timers);
     sm = new NasSm(base, &timers);
@@ -28,7 +28,7 @@ NasTask::NasTask(TaskBase *base) : base{base}, timers{}
 
 void NasTask::onStart()
 {
-    usim->initialize(base->config->supi.has_value());
+    usim->initialize(base->ueConfig->supi.has_value());
 
     sm->onStart(mm);
     mm->onStart(sm, usim);

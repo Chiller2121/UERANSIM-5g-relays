@@ -83,7 +83,7 @@ void GnbRrcTask::sendRrcMessage(ASN_RRC_BCCH_BCH_Message *msg)
     w->ueId = 0;
     w->channel = rrc::RrcChannel::BCCH_BCH;
     w->pdu = std::move(pdu);
-    m_base->rlsTask->push(std::move(w));
+    m_base->gnbRlsTask->push(std::move(w));
 }
 
 // e.g. send SIB message
@@ -100,7 +100,7 @@ void GnbRrcTask::sendRrcMessage(ASN_RRC_BCCH_DL_SCH_Message *msg)
     w->ueId = 0;
     w->channel = rrc::RrcChannel::BCCH_DL_SCH;
     w->pdu = std::move(pdu);
-    m_base->rlsTask->push(std::move(w));
+    m_base->gnbRlsTask->push(std::move(w));
 }
 
 void GnbRrcTask::sendRrcMessage(int ueId, ASN_RRC_DL_CCCH_Message *msg)
@@ -116,7 +116,7 @@ void GnbRrcTask::sendRrcMessage(int ueId, ASN_RRC_DL_CCCH_Message *msg)
     w->ueId = ueId;
     w->channel = rrc::RrcChannel::DL_CCCH;
     w->pdu = std::move(pdu);
-    m_base->rlsTask->push(std::move(w));
+    m_base->gnbRlsTask->push(std::move(w));
 }
 
 void GnbRrcTask::sendRrcMessage(int ueId, ASN_RRC_DL_DCCH_Message *msg)
@@ -132,7 +132,7 @@ void GnbRrcTask::sendRrcMessage(int ueId, ASN_RRC_DL_DCCH_Message *msg)
     w->ueId = ueId;
     w->channel = rrc::RrcChannel::DL_DCCH;
     w->pdu = std::move(pdu);
-    m_base->rlsTask->push(std::move(w));
+    m_base->gnbRlsTask->push(std::move(w));
 }
 
 void GnbRrcTask::sendRrcMessage(ASN_RRC_PCCH_Message *msg)
@@ -148,7 +148,7 @@ void GnbRrcTask::sendRrcMessage(ASN_RRC_PCCH_Message *msg)
     w->ueId = 0;
     w->channel = rrc::RrcChannel::PCCH;
     w->pdu = std::move(pdu);
-    m_base->rlsTask->push(std::move(w));
+    m_base->gnbRlsTask->push(std::move(w));
 }
 
 void GnbRrcTask::receiveRrcMessage(int ueId, ASN_RRC_BCCH_BCH_Message *msg)

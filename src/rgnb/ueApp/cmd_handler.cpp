@@ -46,25 +46,25 @@ void UeCmdHandler::sendError(const InetAddress &address, const std::string &outp
 
 void UeCmdHandler::pauseTasks()
 {
-    m_base->nasTask->requestPause();
-    m_base->rrcTask->requestPause();
-    m_base->rlsTask->requestPause();
+    m_base->ueNasTask->requestPause();
+    m_base->ueRrcTask->requestPause();
+    m_base->ueRlsTask->requestPause();
 }
 
 void UeCmdHandler::unpauseTasks()
 {
-    m_base->nasTask->requestUnpause();
-    m_base->rrcTask->requestUnpause();
-    m_base->rlsTask->requestUnpause();
+    m_base->ueNasTask->requestUnpause();
+    m_base->ueRrcTask->requestUnpause();
+    m_base->ueRlsTask->requestUnpause();
 }
 
 bool UeCmdHandler::isAllPaused()
 {
-    if (!m_base->nasTask->isPauseConfirmed())
+    if (!m_base->ueNasTask->isPauseConfirmed())
         return false;
-    if (!m_base->rrcTask->isPauseConfirmed())
+    if (!m_base->ueRrcTask->isPauseConfirmed())
         return false;
-    if (!m_base->rlsTask->isPauseConfirmed())
+    if (!m_base->ueRlsTask->isPauseConfirmed())
         return false;
     return true;
 }
@@ -118,54 +118,54 @@ void UeCmdHandler::handleCmdImpl(NmUeCliCommand &msg)
         }
 
         Json json = Json::Obj({
-            {"cm-state", ToJson(m_base->nasTask->mm->m_cmState)},
-            {"rm-state", ToJson(m_base->nasTask->mm->m_rmState)},
-            {"mm-state", ToJson(m_base->nasTask->mm->m_mmSubState)},
-            {"5u-state", ToJson(m_base->nasTask->mm->m_storage->uState->get())},
-            {"sim-inserted", m_base->nasTask->mm->m_usim->isValid()},
+            {"cm-state", ToJson(m_base->ueNasTask->mm->m_cmState)},
+            {"rm-state", ToJson(m_base->ueNasTask->mm->m_rmState)},
+            {"mm-state", ToJson(m_base->ueNasTask->mm->m_mmSubState)},
+            {"5u-state", ToJson(m_base->ueNasTask->mm->m_storage->uState->get())},
+            {"sim-inserted", m_base->ueNasTask->mm->m_usim->isValid()},
             {"selected-plmn", ::ToJson(m_base->shCtx.selectedPlmn.get())},
             {"current-cell", ::ToJson(currentCellId)},
             {"current-plmn", ::ToJson(currentPlmn)},
             {"current-tac", ::ToJson(currentTac)},
-            {"last-tai", ToJson(m_base->nasTask->mm->m_storage->lastVisitedRegisteredTai)},
-            {"stored-suci", ToJson(m_base->nasTask->mm->m_storage->storedSuci->get())},
-            {"stored-guti", ToJson(m_base->nasTask->mm->m_storage->storedGuti->get())},
-            {"has-emergency", ::ToJson(m_base->nasTask->mm->hasEmergency())},
+            {"last-tai", ToJson(m_base->ueNasTask->mm->m_storage->lastVisitedRegisteredTai)},
+            {"stored-suci", ToJson(m_base->ueNasTask->mm->m_storage->storedSuci->get())},
+            {"stored-guti", ToJson(m_base->ueNasTask->mm->m_storage->storedGuti->get())},
+            {"has-emergency", ::ToJson(m_base->ueNasTask->mm->hasEmergency())},
         });
         sendResult(msg.address, json.dumpYaml());
         break;
     }
     case app::UeCliCommand::INFO: {
         auto json = Json::Obj({
-            {"supi", ToJson(m_base->config->supi)},
-            {"hplmn", ToJson(m_base->config->hplmn)},
-            {"imei", ::ToJson(m_base->config->imei)},
-            {"imeisv", ::ToJson(m_base->config->imeiSv)},
-            {"ecall-only", ::ToJson(m_base->nasTask->usim->m_isECallOnly)},
+            {"supi", ToJson(m_base->ueConfig->supi)},
+            {"hplmn", ToJson(m_base->ueConfig->hplmn)},
+            {"imei", ::ToJson(m_base->ueConfig->imei)},
+            {"imeisv", ::ToJson(m_base->ueConfig->imeiSv)},
+            {"ecall-only", ::ToJson(m_base->ueNasTask->usim->m_isECallOnly)},
             {"uac-aic", Json::Obj({
-                            {"mps", m_base->config->uacAic.mps},
-                            {"mcs", m_base->config->uacAic.mcs},
+                            {"mps", m_base->ueConfig->uacAic.mps},
+                            {"mcs", m_base->ueConfig->uacAic.mcs},
                         })},
             {"uac-acc", Json::Obj({
-                            {"normal-class", m_base->config->uacAcc.normalCls},
-                            {"class-11", m_base->config->uacAcc.cls11},
-                            {"class-12", m_base->config->uacAcc.cls12},
-                            {"class-13", m_base->config->uacAcc.cls13},
-                            {"class-14", m_base->config->uacAcc.cls14},
-                            {"class-15", m_base->config->uacAcc.cls15},
+                            {"normal-class", m_base->ueConfig->uacAcc.normalCls},
+                            {"class-11", m_base->ueConfig->uacAcc.cls11},
+                            {"class-12", m_base->ueConfig->uacAcc.cls12},
+                            {"class-13", m_base->ueConfig->uacAcc.cls13},
+                            {"class-14", m_base->ueConfig->uacAcc.cls14},
+                            {"class-15", m_base->ueConfig->uacAcc.cls15},
                         })},
-            {"is-high-priority", m_base->nasTask->mm->isHighPriority()},
+            {"is-high-priority", m_base->ueNasTask->mm->isHighPriority()},
         });
 
         sendResult(msg.address, json.dumpYaml());
         break;
     }
     case app::UeCliCommand::TIMERS: {
-        sendResult(msg.address, ToJson(m_base->nasTask->timers).dumpYaml());
+        sendResult(msg.address, ToJson(m_base->ueNasTask->timers).dumpYaml());
         break;
     }
     case app::UeCliCommand::DE_REGISTER: {
-        m_base->nasTask->mm->deregistrationRequired(msg.cmd->deregCause);
+        m_base->ueNasTask->mm->deregistrationRequired(msg.cmd->deregCause);
 
         if (msg.cmd->deregCause != EDeregCause::SWITCH_OFF)
             sendResult(msg.address, "De-registration procedure triggered");
@@ -175,28 +175,28 @@ void UeCmdHandler::handleCmdImpl(NmUeCliCommand &msg)
     }
     case app::UeCliCommand::PS_RELEASE: {
         for (int i = 0; i < msg.cmd->psCount; i++)
-            m_base->nasTask->sm->sendReleaseRequest(static_cast<int>(msg.cmd->psIds[i]) % 16);
+            m_base->ueNasTask->sm->sendReleaseRequest(static_cast<int>(msg.cmd->psIds[i]) % 16);
         sendResult(msg.address, "PDU session release procedure(s) triggered");
         break;
     }
     case app::UeCliCommand::PS_RELEASE_ALL: {
-        m_base->nasTask->sm->sendReleaseRequestForAll();
+        m_base->ueNasTask->sm->sendReleaseRequestForAll();
         sendResult(msg.address, "PDU session release procedure(s) triggered");
         break;
     }
     case app::UeCliCommand::PS_ESTABLISH: {
-        SessionConfig config;
-        config.type = nas::EPduSessionType::IPV4;
-        config.isEmergency = msg.cmd->isEmergency;
-        config.apn = msg.cmd->apn;
-        config.sNssai = msg.cmd->sNssai;
-        m_base->nasTask->sm->sendEstablishmentRequest(config);
+        SessionConfig ueConfig;
+        ueConfig.type = nas::EPduSessionType::IPV4;
+        ueConfig.isEmergency = msg.cmd->isEmergency;
+        ueConfig.apn = msg.cmd->apn;
+        ueConfig.sNssai = msg.cmd->sNssai;
+        m_base->ueNasTask->sm->sendEstablishmentRequest(ueConfig);
         sendResult(msg.address, "PDU session establishment procedure triggered");
         break;
     }
     case app::UeCliCommand::PS_LIST: {
         Json json = Json::Obj({});
-        for (auto *pduSession : m_base->nasTask->sm->m_pduSessions)
+        for (auto *pduSession : m_base->ueNasTask->sm->m_pduSessions)
         {
             if (pduSession->psi == 0 || pduSession->psState == EPsState::INACTIVE)
                 continue;
@@ -219,8 +219,8 @@ void UeCmdHandler::handleCmdImpl(NmUeCliCommand &msg)
     }
     case app::UeCliCommand::RLS_STATE: {
         Json json = Json::Obj({
-            {"sti", OctetString::FromOctet8(m_base->rlsTask->m_shCtx->sti).toHexString()},
-            {"gnb-search-space", ::ToJson(m_base->config->gnbSearchList)},
+            {"sti", OctetString::FromOctet8(m_base->ueRlsTask->m_shCtx->sti).toHexString()},
+            {"gnb-search-space", ::ToJson(m_base->ueConfig->gnbSearchList)},
         });
         sendResult(msg.address, json.dumpYaml());
         break;
@@ -228,7 +228,7 @@ void UeCmdHandler::handleCmdImpl(NmUeCliCommand &msg)
     case app::UeCliCommand::COVERAGE: {
         Json json = Json::Obj({});
 
-        const auto &cells = m_base->rrcTask->m_cellDesc;
+        const auto &cells = m_base->ueRrcTask->m_cellDesc;
         for (auto &item : cells)
         {
             auto &cell = item.second;

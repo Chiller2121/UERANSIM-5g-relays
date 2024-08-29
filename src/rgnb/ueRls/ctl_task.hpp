@@ -21,20 +21,20 @@
 namespace nr::rgnb
 {
 
-class RlsControlTask : public NtsTask
+class UeRlsControlTask : public NtsTask
 {
   private:
     std::unique_ptr<Logger> m_logger;
     RlsSharedContext *m_shCtx;
     int m_servingCell;
     NtsTask *m_mainTask;
-    RlsUdpTask *m_udpTask;
+    UeRlsUdpTask *m_udpTask;
     std::unordered_map<uint32_t, rls::PduInfo> m_pduMap;
     std::unordered_map<int, std::vector<uint32_t>> m_pendingAck;
 
   public:
-    explicit RlsControlTask(TaskBase *base, RlsSharedContext *shCtx);
-    ~RlsControlTask() override = default;
+    explicit UeRlsControlTask(TaskBase *base, RlsSharedContext *shCtx);
+    ~UeRlsControlTask() override = default;
 
   protected:
     void onStart() override;
@@ -42,7 +42,7 @@ class RlsControlTask : public NtsTask
     void onQuit() override;
 
   public:
-    void initialize(NtsTask *mainTask, RlsUdpTask *udpTask);
+    void initialize(NtsTask *mainTask, UeRlsUdpTask *udpTask);
 
   private:
     void handleRlsMessage(int cellId, rls::RlsMessage &msg);

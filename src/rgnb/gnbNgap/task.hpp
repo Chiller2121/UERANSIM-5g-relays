@@ -11,7 +11,7 @@
 #include <optional>
 #include <unordered_map>
 
-#include <rgnb/gnbNts.hpp>
+#include <rgnb/nts.hpp>
 #include <rgnb/types.hpp>
 #include <lib/app/monitor.hpp>
 #include <utils/logger.hpp>

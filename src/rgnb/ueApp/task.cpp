@@ -23,7 +23,7 @@ namespace nr::rgnb
 
 UeAppTask::UeAppTask(TaskBase *base) : m_base{base}
 {
-    m_logger = m_base->logBase->makeUniqueLogger(m_base->config->getLoggerPrefix() + "app");
+    m_logger = m_base->logBase->makeUniqueLogger(m_base->ueConfig->getLoggerPrefix() + "ueApp");
 }
 
 void UeAppTask::onStart()
@@ -59,7 +59,7 @@ void UeAppTask::onLoop()
             auto m = std::make_unique<NmUeAppToNas>(NmUeAppToNas::UPLINK_DATA_DELIVERY);
             m->psi = w.psi;
             m->data = std::move(w.data);
-            m_base->nasTask->push(std::move(m));
+            m_base->ueNasTask->push(std::move(m));
             break;
         }
         case NmUeTunToApp::TUN_ERROR: {
@@ -106,7 +106,7 @@ void UeAppTask::onLoop()
         if (w.timerId == SWITCH_OFF_TIMER_ID)
         {
             m_logger->info("UE device is switching off");
-            m_base->ueController->performSwitchOff(m_base->ue);
+//            m_base->ueController->performSwitchOff(m_base->ue); // TODO: Switch Off
         }
         break;
     }
@@ -181,8 +181,8 @@ void UeAppTask::setupTunInterface(const PduSession *pduSession)
 
     std::string error{}, allocatedName{};
     std::string requestedName = cons::TunNamePrefix;
-    if (m_base->config->tunName.has_value())
-        requestedName = *m_base->config->tunName;
+    if (m_base->ueConfig->tunName.has_value())
+        requestedName = *m_base->ueConfig->tunName;
     int fd = tun::TunAllocate(requestedName.c_str(), allocatedName, error);
     if (fd == 0 || error.length() > 0)
     {
@@ -192,7 +192,7 @@ void UeAppTask::setupTunInterface(const PduSession *pduSession)
 
     std::string ipAddress = utils::OctetStringToIp(pduSession->pduAddress->pduAddressInformation);
 
-    bool r = tun::TunConfigure(allocatedName, ipAddress, cons::TunMtu, m_base->config->configureRouting, error);
+    bool r = tun::TunConfigure(allocatedName, ipAddress, cons::TunMtu, m_base->ueConfig->configureRouting, error);
     if (!r || error.length() > 0)
     {
         m_logger->err("TUN configuration failure [%s]", error.c_str());

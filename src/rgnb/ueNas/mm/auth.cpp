@@ -167,7 +167,7 @@ void NasMm::receiveAuthenticationRequestEap(const nas::AuthenticationRequest &ms
         auto &ckPrime = ckPrimeIkPrime.first;
         auto &ikPrime = ckPrimeIkPrime.second;
 
-        auto mk = keys::CalculateMk(ckPrime, ikPrime, m_base->config->supi.value());
+        auto mk = keys::CalculateMk(ckPrime, ikPrime, m_base->ueConfig->supi.value());
         auto kaut = mk.subCopy(16, 32);
 
         // Check the received AT_MAC
@@ -200,7 +200,7 @@ void NasMm::receiveAuthenticationRequestEap(const nas::AuthenticationRequest &ms
         m_usim->m_nonCurrentNsCtx->keys.kAusf = keys::CalculateKAusfFor5gAka(milenage.ck, milenage.ik, snn, sqnXorAk);
         m_usim->m_nonCurrentNsCtx->keys.abba = msg.abba.rawData.copy();
 
-        keys::DeriveKeysSeafAmf(*m_base->config, currentPlmn, *m_usim->m_nonCurrentNsCtx);
+        keys::DeriveKeysSeafAmf(*m_base->ueConfig, currentPlmn, *m_usim->m_nonCurrentNsCtx);
 
         // Send response
         m_nwConsecutiveAuthFailure = 0;
@@ -367,7 +367,7 @@ void NasMm::receiveAuthenticationRequest5gAka(const nas::AuthenticationRequest &
         m_usim->m_nonCurrentNsCtx->keys.kAusf = keys::CalculateKAusfFor5gAka(milenage.ck, milenage.ik, snn, sqnXorAk);
         m_usim->m_nonCurrentNsCtx->keys.abba = msg.abba.rawData.copy();
 
-        keys::DeriveKeysSeafAmf(*m_base->config, currentPLmn, *m_usim->m_nonCurrentNsCtx);
+        keys::DeriveKeysSeafAmf(*m_base->ueConfig, currentPLmn, *m_usim->m_nonCurrentNsCtx);
 
         // Send response
         m_nwConsecutiveAuthFailure = 0;
@@ -513,13 +513,13 @@ EAutnValidationRes NasMm::validateAutn(const OctetString &rand, const OctetStrin
 
 crypto::milenage::Milenage NasMm::calculateMilenage(const OctetString &sqn, const OctetString &rand, bool dummyAmf)
 {
-    OctetString amf = dummyAmf ? OctetString::FromSpare(2) : m_base->config->amf.copy();
+    OctetString amf = dummyAmf ? OctetString::FromSpare(2) : m_base->ueConfig->amf.copy();
 
-    if (m_base->config->opType == OpType::OPC)
-        return crypto::milenage::Calculate(m_base->config->opC, m_base->config->key, rand, sqn, amf);
+    if (m_base->ueConfig->opType == OpType::OPC)
+        return crypto::milenage::Calculate(m_base->ueConfig->opC, m_base->ueConfig->key, rand, sqn, amf);
 
-    OctetString opc = crypto::milenage::CalculateOpC(m_base->config->opC, m_base->config->key);
-    return crypto::milenage::Calculate(opc, m_base->config->key, rand, sqn, amf);
+    OctetString opc = crypto::milenage::CalculateOpC(m_base->ueConfig->opC, m_base->ueConfig->key);
+    return crypto::milenage::Calculate(opc, m_base->ueConfig->key, rand, sqn, amf);
 }
 
 bool NasMm::networkFailingTheAuthCheck(bool hasChance)

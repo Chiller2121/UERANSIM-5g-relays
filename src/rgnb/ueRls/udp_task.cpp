@@ -24,11 +24,11 @@ static constexpr const int HEARTBEAT_THRESHOLD = 2000; // (LOOP_PERIOD + RECEIVE
 namespace nr::rgnb
 {
 
-RlsUdpTask::RlsUdpTask(TaskBase *base, RlsSharedContext *shCtx, const std::vector<std::string> &searchSpace)
+UeRlsUdpTask::UeRlsUdpTask(TaskBase *base, RlsSharedContext *shCtx, const std::vector<std::string> &searchSpace)
     : m_server{}, m_ctlTask{}, m_shCtx{shCtx}, m_searchSpace{}, m_cells{}, m_cellIdToSti{}, m_lastLoop{},
       m_cellIdCounter{}
 {
-    m_logger = base->logBase->makeUniqueLogger(base->config->getLoggerPrefix() + "rls-udp");
+    m_logger = base->logBase->makeUniqueLogger(base->ueConfig->getLoggerPrefix() + "rls-udp");
 
     m_server = new udp::UdpServer();
 
@@ -38,11 +38,11 @@ RlsUdpTask::RlsUdpTask(TaskBase *base, RlsSharedContext *shCtx, const std::vecto
     m_simPos = Vector3{};
 }
 
-void RlsUdpTask::onStart()
+void UeRlsUdpTask::onStart()
 {
 }
 
-void RlsUdpTask::onLoop()
+void UeRlsUdpTask::onLoop()
 {
     auto current = utils::CurrentTimeMillis();
     if (current - m_lastLoop > LOOP_PERIOD)
@@ -65,12 +65,12 @@ void RlsUdpTask::onLoop()
     }
 }
 
-void RlsUdpTask::onQuit()
+void UeRlsUdpTask::onQuit()
 {
     delete m_server;
 }
 
-void RlsUdpTask::sendRlsPdu(const InetAddress &addr, const rls::RlsMessage &msg)
+void UeRlsUdpTask::sendRlsPdu(const InetAddress &addr, const rls::RlsMessage &msg)
 {
     OctetString stream;
     rls::EncodeRlsMessage(msg, stream);
@@ -78,7 +78,7 @@ void RlsUdpTask::sendRlsPdu(const InetAddress &addr, const rls::RlsMessage &msg)
     m_server->Send(addr, stream.data(), static_cast<size_t>(stream.length()));
 }
 
-void RlsUdpTask::send(int cellId, const rls::RlsMessage &msg)
+void UeRlsUdpTask::send(int cellId, const rls::RlsMessage &msg)
 {
     if (m_cellIdToSti.count(cellId))
     {
@@ -87,7 +87,7 @@ void RlsUdpTask::send(int cellId, const rls::RlsMessage &msg)
     }
 }
 
-void RlsUdpTask::receiveRlsPdu(const InetAddress &addr, std::unique_ptr<rls::RlsMessage> &&msg)
+void UeRlsUdpTask::receiveRlsPdu(const InetAddress &addr, std::unique_ptr<rls::RlsMessage> &&msg)
 {
     if (msg->msgType == rls::EMessageType::HEARTBEAT_ACK)
     {
@@ -124,7 +124,7 @@ void RlsUdpTask::receiveRlsPdu(const InetAddress &addr, std::unique_ptr<rls::Rls
     m_ctlTask->push(std::move(w));
 }
 
-void RlsUdpTask::onSignalChangeOrLost(int cellId)
+void UeRlsUdpTask::onSignalChangeOrLost(int cellId)
 {
     int dbm = INT32_MIN;
     if (m_cellIdToSti.count(cellId))
@@ -139,7 +139,7 @@ void RlsUdpTask::onSignalChangeOrLost(int cellId)
     m_ctlTask->push(std::move(w));
 }
 
-void RlsUdpTask::heartbeatCycle(uint64_t time, const Vector3 &simPos)
+void UeRlsUdpTask::heartbeatCycle(uint64_t time, const Vector3 &simPos)
 {
     std::set<std::pair<uint64_t, int>> toRemove;
 
@@ -167,7 +167,7 @@ void RlsUdpTask::heartbeatCycle(uint64_t time, const Vector3 &simPos)
     }
 }
 
-void RlsUdpTask::initialize(NtsTask *ctlTask)
+void UeRlsUdpTask::initialize(NtsTask *ctlTask)
 {
     m_ctlTask = ctlTask;
 }

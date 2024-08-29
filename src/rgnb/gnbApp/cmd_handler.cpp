@@ -35,33 +35,33 @@ void GnbCmdHandler::sendError(const InetAddress &address, const std::string &out
 
 void GnbCmdHandler::pauseTasks()
 {
-    m_base->gtpTask->requestPause();
-    m_base->rlsTask->requestPause();
-    m_base->ngapTask->requestPause();
-    m_base->rrcTask->requestPause();
-    m_base->sctpTask->requestPause();
+    m_base->gnbGtpTask->requestPause();
+    m_base->gnbRlsTask->requestPause();
+    m_base->gnbNgapTask->requestPause();
+    m_base->gnbRrcTask->requestPause();
+    m_base->gnbSctpTask->requestPause();
 }
 
 void GnbCmdHandler::unpauseTasks()
 {
-    m_base->gtpTask->requestUnpause();
-    m_base->rlsTask->requestUnpause();
-    m_base->ngapTask->requestUnpause();
-    m_base->rrcTask->requestUnpause();
-    m_base->sctpTask->requestUnpause();
+    m_base->gnbGtpTask->requestUnpause();
+    m_base->gnbRlsTask->requestUnpause();
+    m_base->gnbNgapTask->requestUnpause();
+    m_base->gnbRrcTask->requestUnpause();
+    m_base->gnbSctpTask->requestUnpause();
 }
 
 bool GnbCmdHandler::isAllPaused()
 {
-    if (!m_base->gtpTask->isPauseConfirmed())
+    if (!m_base->gnbGtpTask->isPauseConfirmed())
         return false;
-    if (!m_base->rlsTask->isPauseConfirmed())
+    if (!m_base->gnbRlsTask->isPauseConfirmed())
         return false;
-    if (!m_base->ngapTask->isPauseConfirmed())
+    if (!m_base->gnbNgapTask->isPauseConfirmed())
         return false;
-    if (!m_base->rrcTask->isPauseConfirmed())
+    if (!m_base->gnbRrcTask->isPauseConfirmed())
         return false;
-    if (!m_base->sctpTask->isPauseConfirmed())
+    if (!m_base->gnbSctpTask->isPauseConfirmed())
         return false;
     return true;
 }
@@ -102,33 +102,33 @@ void GnbCmdHandler::handleCmdImpl(NmGnbCliCommand &msg)
     switch (msg.cmd->present)
     {
     case app::GnbCliCommand::STATUS: {
-        sendResult(msg.address, ToJson(m_base->appTask->m_statusInfo).dumpYaml());
+        sendResult(msg.address, ToJson(m_base->gnbAppTask->m_statusInfo).dumpYaml());
         break;
     }
     case app::GnbCliCommand::INFO: {
-        sendResult(msg.address, ToJson(*m_base->config).dumpYaml());
+        sendResult(msg.address, ToJson(*m_base->gnbConfig).dumpYaml());
         break;
     }
     case app::GnbCliCommand::AMF_LIST: {
         Json json = Json::Arr({});
-        for (auto &amf : m_base->ngapTask->m_amfCtx)
+        for (auto &amf : m_base->gnbNgapTask->m_amfCtx)
             json.push(Json::Obj({{"id", amf.first}}));
         sendResult(msg.address, json.dumpYaml());
         break;
     }
     case app::GnbCliCommand::AMF_INFO: {
-        if (m_base->ngapTask->m_amfCtx.count(msg.cmd->amfId) == 0)
+        if (m_base->gnbNgapTask->m_amfCtx.count(msg.cmd->amfId) == 0)
             sendError(msg.address, "AMF not found with given ID");
         else
         {
-            auto amf = m_base->ngapTask->m_amfCtx[msg.cmd->amfId];
+            auto amf = m_base->gnbNgapTask->m_amfCtx[msg.cmd->amfId];
             sendResult(msg.address, ToJson(*amf).dumpYaml());
         }
         break;
     }
     case app::GnbCliCommand::UE_LIST: {
         Json json = Json::Arr({});
-        for (auto &ue : m_base->ngapTask->m_ueCtx)
+        for (auto &ue : m_base->gnbNgapTask->m_ueCtx)
         {
             json.push(Json::Obj({
                 {"ue-id", ue.first},
@@ -140,16 +140,16 @@ void GnbCmdHandler::handleCmdImpl(NmGnbCliCommand &msg)
         break;
     }
     case app::GnbCliCommand::UE_COUNT: {
-        sendResult(msg.address, std::to_string(m_base->ngapTask->m_ueCtx.size()));
+        sendResult(msg.address, std::to_string(m_base->gnbNgapTask->m_ueCtx.size()));
         break;
     }
     case app::GnbCliCommand::UE_RELEASE_REQ: {
-        if (m_base->ngapTask->m_ueCtx.count(msg.cmd->ueId) == 0)
+        if (m_base->gnbNgapTask->m_ueCtx.count(msg.cmd->ueId) == 0)
             sendError(msg.address, "UE not found with given ID");
         else
         {
-            auto ue = m_base->ngapTask->m_ueCtx[msg.cmd->ueId];
-            m_base->ngapTask->sendContextRelease(ue->ctxId, NgapCause::RadioNetwork_unspecified);
+            auto ue = m_base->gnbNgapTask->m_ueCtx[msg.cmd->ueId];
+            m_base->gnbNgapTask->sendContextRelease(ue->ctxId, NgapCause::RadioNetwork_unspecified);
             sendResult(msg.address, "Requesting UE context release");
         }
         break;

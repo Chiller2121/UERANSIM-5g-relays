@@ -63,7 +63,7 @@ void GnbRrcTask::deliverUplinkNas(int ueId, OctetString &&nasPdu)
     auto w = std::make_unique<NmGnbRrcToNgap>(NmGnbRrcToNgap::UPLINK_NAS_DELIVERY);
     w->ueId = ueId;
     w->pdu = std::move(nasPdu);
-    m_base->ngapTask->push(std::move(w));
+    m_base->gnbNgapTask->push(std::move(w));
 }
 
 void GnbRrcTask::receiveUplinkInformationTransfer(int ueId, const ASN_RRC_ULInformationTransfer &msg)
@@ -99,7 +99,7 @@ void GnbRrcTask::handleRadioLinkFailure(int ueId)
     // Notify NGAP task
     auto w = std::make_unique<NmGnbRrcToNgap>(NmGnbRrcToNgap::RADIO_LINK_FAILURE);
     w->ueId = ueId;
-    m_base->ngapTask->push(std::move(w));
+    m_base->gnbNgapTask->push(std::move(w));
 
     // Delete UE RRC context
     m_ueCtx.erase(ueId);

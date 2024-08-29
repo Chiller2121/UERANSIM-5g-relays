@@ -56,7 +56,7 @@ static EMmState GetMmStateFromSubState(EMmSubState subState)
 
 NasMm::NasMm(TaskBase *base, NasTimers *timers) : m_base{base}, m_timers{timers}, m_sm{}, m_usim{}, m_procCtl{}
 {
-    m_logger = base->logBase->makeUniqueLogger(base->config->getLoggerPrefix() + "nas");
+    m_logger = base->logBase->makeUniqueLogger(base->ueConfig->getLoggerPrefix() + "nas");
 
     m_rmState = ERmState::RM_DEREGISTERED;
     m_cmState = ECmState::CM_IDLE;
@@ -81,7 +81,7 @@ void NasMm::onQuit()
 
 void NasMm::triggerMmCycle()
 {
-    m_base->nasTask->push(std::make_unique<NmUeNasToNas>(NmUeNasToNas::PERFORM_MM_CYCLE));
+    m_base->ueNasTask->push(std::make_unique<NmUeNasToNas>(NmUeNasToNas::PERFORM_MM_CYCLE));
 }
 
 void NasMm::performMmCycle()
@@ -230,7 +230,7 @@ void NasMm::switchMmState(EMmSubState subState)
 
     if (m_base->nodeListener)
     {
-        m_base->nodeListener->onSwitch(app::NodeType::UE, m_base->config->getNodeName(), app::StateType::RM,
+        m_base->nodeListener->onSwitch(app::NodeType::UE, m_base->ueConfig->getNodeName(), app::StateType::RM,
                                        ToJson(oldRmState).str(), ToJson(m_rmState).str());
     }
 
@@ -246,9 +246,9 @@ void NasMm::switchMmState(EMmSubState subState)
 
     if (m_base->nodeListener)
     {
-        m_base->nodeListener->onSwitch(app::NodeType::UE, m_base->config->getNodeName(), app::StateType::MM,
+        m_base->nodeListener->onSwitch(app::NodeType::UE, m_base->ueConfig->getNodeName(), app::StateType::MM,
                                        ToJson(oldSubState).str(), ToJson(subState).str());
-        m_base->nodeListener->onSwitch(app::NodeType::UE, m_base->config->getNodeName(), app::StateType::MM_SUB,
+        m_base->nodeListener->onSwitch(app::NodeType::UE, m_base->ueConfig->getNodeName(), app::StateType::MM_SUB,
                                        ToJson(oldState).str(), ToJson(state).str());
     }
 
@@ -270,11 +270,11 @@ void NasMm::switchCmState(ECmState state)
 
     auto statusUpdate = std::make_unique<NmUeStatusUpdate>(NmUeStatusUpdate::CM_STATE);
     statusUpdate->cmState = m_cmState;
-    m_base->appTask->push(std::move(statusUpdate));
+    m_base->ueAppTask->push(std::move(statusUpdate));
 
     if (m_base->nodeListener)
     {
-        m_base->nodeListener->onSwitch(app::NodeType::UE, m_base->config->getNodeName(), app::StateType::CM,
+        m_base->nodeListener->onSwitch(app::NodeType::UE, m_base->ueConfig->getNodeName(), app::StateType::CM,
                                        ToJson(oldState).str(), ToJson(m_cmState).str());
     }
 
@@ -290,7 +290,7 @@ void NasMm::switchUState(E5UState state)
 
     if (m_base->nodeListener)
     {
-        m_base->nodeListener->onSwitch(app::NodeType::UE, m_base->config->getNodeName(), app::StateType::U5,
+        m_base->nodeListener->onSwitch(app::NodeType::UE, m_base->ueConfig->getNodeName(), app::StateType::U5,
                                        ToJson(oldState).str(), ToJson(state).str());
     }
 

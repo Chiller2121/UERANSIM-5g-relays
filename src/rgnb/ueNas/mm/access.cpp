@@ -95,7 +95,7 @@ bool NasMm::hasEmergency()
 
 bool NasMm::isHighPriority()
 {
-    auto &acc = m_base->config->uacAcc;
+    auto &acc = m_base->ueConfig->uacAcc;
     return acc.cls11 || acc.cls12 || acc.cls13 || acc.cls14 || acc.cls15;
 }
 
@@ -130,17 +130,17 @@ EUacResult NasMm::performUac()
 
         auto currentPlmn = m_base->shCtx.getCurrentPlmn();
 
-        if (m_base->config->uacAic.mps && m_rmState == ERmState::RM_REGISTERED && currentPlmn.hasValue())
+        if (m_base->ueConfig->uacAic.mps && m_rmState == ERmState::RM_REGISTERED && currentPlmn.hasValue())
         {
-            if (currentPlmn == m_base->config->hplmn || m_storage->equivalentPlmnList->contains(currentPlmn) ||
-                currentPlmn.mcc == m_base->config->hplmn.mcc)
+            if (currentPlmn == m_base->ueConfig->hplmn || m_storage->equivalentPlmnList->contains(currentPlmn) ||
+                currentPlmn.mcc == m_base->ueConfig->hplmn.mcc)
                 ais[1] = true;
         }
 
-        if (m_base->config->uacAic.mcs && m_rmState == ERmState::RM_REGISTERED && currentPlmn.hasValue())
+        if (m_base->ueConfig->uacAic.mcs && m_rmState == ERmState::RM_REGISTERED && currentPlmn.hasValue())
         {
-            if (currentPlmn == m_base->config->hplmn || m_storage->equivalentPlmnList->contains(currentPlmn) ||
-                currentPlmn.mcc == m_base->config->hplmn.mcc)
+            if (currentPlmn == m_base->ueConfig->hplmn || m_storage->equivalentPlmnList->contains(currentPlmn) ||
+                currentPlmn.mcc == m_base->ueConfig->hplmn.mcc)
                 ais[2] = true;
         }
 
@@ -153,22 +153,22 @@ EUacResult NasMm::performUac()
         }
 
         if (currentPlmn.hasValue() &&
-            (currentPlmn == m_base->config->hplmn || m_storage->equivalentPlmnList->contains(currentPlmn)))
+            (currentPlmn == m_base->ueConfig->hplmn || m_storage->equivalentPlmnList->contains(currentPlmn)))
         {
-            if (m_base->config->uacAcc.cls11)
+            if (m_base->ueConfig->uacAcc.cls11)
                 ais[11] = true;
-            if (m_base->config->uacAcc.cls15)
+            if (m_base->ueConfig->uacAcc.cls15)
                 ais[15] = true;
         }
 
         if (currentPlmn.hasValue() &&
-            (currentPlmn == m_base->config->hplmn || currentPlmn.mcc == m_base->config->hplmn.mcc))
+            (currentPlmn == m_base->ueConfig->hplmn || currentPlmn.mcc == m_base->ueConfig->hplmn.mcc))
         {
-            if (m_base->config->uacAcc.cls12)
+            if (m_base->ueConfig->uacAcc.cls12)
                 ais[12] = true;
-            if (m_base->config->uacAcc.cls13)
+            if (m_base->ueConfig->uacAcc.cls13)
                 ais[13] = true;
-            if (m_base->config->uacAcc.cls14)
+            if (m_base->ueConfig->uacAcc.cls14)
                 ais[14] = true;
         }
 
@@ -269,7 +269,7 @@ EUacResult NasMm::performUac()
 
     auto w = std::make_unique<NmUeNasToRrc>(NmUeNasToRrc::PERFORM_UAC);
     w->uacCtl = uacCtl;
-    m_base->rrcTask->push(std::move(w));
+    m_base->ueRrcTask->push(std::move(w));
 
     auto uacOutput = uacCtl->waitForProcess();
 

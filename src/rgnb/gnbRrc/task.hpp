@@ -42,7 +42,7 @@ class GnbRrcTask : public NtsTask
 {
   private:
     TaskBase *m_base;
-    GnbConfig *m_config;
+    RGnbGnbConfig *m_config;
     std::unique_ptr<Logger> m_logger;
 
     std::unordered_map<int, RrcUeContext *> m_ueCtx;

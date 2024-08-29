@@ -233,14 +233,14 @@ std::optional<NgapCause> NgapTask::setupPduSessionResource(NgapUeContext *ue, Pd
         return NgapCause::Protocol_semantic_error;
     }
 
-    std::string gtpIp = m_base->config->gtpAdvertiseIp.value_or(m_base->config->gtpIp);
+    std::string gtpIp = m_base->gnbConfig->gtpAdvertiseIp.value_or(m_base->gnbConfig->gtpIp);
 
     resource->downTunnel.address = utils::IpToOctetString(gtpIp);
     resource->downTunnel.teid = ++m_downlinkTeidCounter;
 
     auto w = std::make_unique<NmGnbNgapToGtp>(NmGnbNgapToGtp::SESSION_CREATE);
     w->resource = resource;
-    m_base->gtpTask->push(std::move(w));
+    m_base->gnbGtpTask->push(std::move(w));
 
     ue->pduSessions.insert(resource->psi);
 
@@ -284,7 +284,7 @@ void NgapTask::receiveSessionResourceReleaseCommand(int amfId, ASN_NGAP_PDUSessi
         auto w = std::make_unique<NmGnbNgapToGtp>(NmGnbNgapToGtp::SESSION_RELEASE);
         w->ueId = ue->ctxId;
         w->psi = psi;
-        m_base->gtpTask->push(std::move(w));
+        m_base->gnbGtpTask->push(std::move(w));
 
         ue->pduSessions.erase(psi);
     }

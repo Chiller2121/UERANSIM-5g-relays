@@ -22,14 +22,14 @@ GtpTask::GtpTask(TaskBase *base)
     : m_base{base}, m_udpServer{}, m_ueContexts{}, m_rateLimiter(std::make_unique<RateLimiter>()), m_pduSessions{},
       m_sessionTree{}
 {
-    m_logger = m_base->logBase->makeUniqueLogger("gtp");
+    m_logger = m_base->logBase->makeUniqueLogger("gnbGtp");
 }
 
 void GtpTask::onStart()
 {
     try
     {
-        m_udpServer = new udp::UdpServerTask(m_base->config->gtpIp, cons::GtpPort, this);
+        m_udpServer = new udp::UdpServerTask(m_base->gnbConfig->gtpIp, cons::GtpPort, this);
         m_udpServer->start();
     }
     catch (const LibError &e)
@@ -240,7 +240,7 @@ void GtpTask::handleUdpReceive(const udp::NwUdpServerReceive &msg)
             w->ueId = GetUeId(sessionInd);
             w->psi = GetPsi(sessionInd);
             w->pdu = std::move(gtp->payload);
-            m_base->rlsTask->push(std::move(w));
+            m_base->gnbRlsTask->push(std::move(w));
         }
         return;
     }

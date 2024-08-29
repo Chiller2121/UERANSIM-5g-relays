@@ -18,10 +18,10 @@ namespace nr::rgnb
 
 GnbRlsTask::GnbRlsTask(TaskBase *base) : m_base{base}
 {
-    m_logger = m_base->logBase->makeUniqueLogger("rls");
-    m_sti = Random::Mixed(base->config->name).nextUL();
+    m_logger = m_base->logBase->makeUniqueLogger("gnbRls");
+    m_sti = Random::Mixed(base->gnbConfig->name).nextUL();
 
-    m_udpTask = new RlsUdpTask(base, m_sti, base->config->phyLocation);
+    m_udpTask = new RlsUdpTask(base, m_sti, base->gnbConfig->phyLocation);
     m_ctlTask = new RlsControlTask(base, m_sti);
 
     m_udpTask->initialize(m_ctlTask);
@@ -49,7 +49,7 @@ void GnbRlsTask::onLoop()
         case NmGnbRlsToRls::SIGNAL_DETECTED: {
             auto m = std::make_unique<NmGnbRlsToRrc>(NmGnbRlsToRrc::SIGNAL_DETECTED);
             m->ueId = w.ueId;
-            m_base->rrcTask->push(std::move(m));
+            m_base->gnbRrcTask->push(std::move(m));
             break;
         }
         case NmGnbRlsToRls::SIGNAL_LOST: {
@@ -62,7 +62,7 @@ void GnbRlsTask::onLoop()
             m->ueId = w.ueId;
             m->psi = w.psi; //PDU Session identity
             m->pdu = std::move(w.data);
-            m_base->gtpTask->push(std::move(m));
+            m_base->gnbGtpTask->push(std::move(m));
             break;
         }
         case NmGnbRlsToRls::UPLINK_RRC: {
@@ -70,7 +70,7 @@ void GnbRlsTask::onLoop()
             m->ueId = w.ueId;
             m->rrcChannel = w.rrcChannel;
             m->data = std::move(w.data);
-            m_base->rrcTask->push(std::move(m));
+            m_base->gnbRrcTask->push(std::move(m));
             break;
         }
         case NmGnbRlsToRls::RADIO_LINK_FAILURE: {

@@ -20,7 +20,7 @@ static const int N_UP_int_alg = 0x06;
 namespace nr::rgnb::keys
 {
 
-void DeriveKeysSeafAmf(const UeConfig &ueConfig, const Plmn &currentPlmn, NasSecurityContext &nasSecurityContext)
+void DeriveKeysSeafAmf(const RGnbUeConfig &ueConfig, const Plmn &currentPlmn, NasSecurityContext &nasSecurityContext)
 {
     auto &keys = nasSecurityContext.keys;
     std::string snn = ConstructServingNetworkName(currentPlmn);

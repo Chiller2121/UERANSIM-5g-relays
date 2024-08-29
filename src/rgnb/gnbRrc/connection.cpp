@@ -129,7 +129,7 @@ void GnbRrcTask::receiveRrcSetupComplete(int ueId, const ASN_RRC_RRCSetupComplet
     w->rrcEstablishmentCause = ue->establishmentCause;
     w->sTmsi = ue->sTmsi;
 
-    m_base->ngapTask->push(std::move(w));
+    m_base->gnbNgapTask->push(std::move(w));
 }
 
 } // namespace nr::rgnb

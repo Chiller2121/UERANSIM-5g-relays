@@ -56,7 +56,7 @@ static EMmState GetMmStateFromSubState(EMmSubState subState)
 
 NasMm::NasMm(TaskBase *base, NasTimers *timers) : m_base{base}, m_timers{timers}, m_sm{}, m_usim{}, m_procCtl{}
 {
-    m_logger = base->logBase->makeUniqueLogger(base->config->getLoggerPrefix() + "nas");
+    m_logger = base->logBase->makeUniqueLogger(base->config->getLoggerPrefix() + "ueNas");
 
     m_rmState = ERmState::RM_DEREGISTERED;
     m_cmState = ECmState::CM_IDLE;
@@ -90,6 +90,7 @@ void NasMm::performMmCycle()
     if (m_mmState == EMmState::MM_NULL)
         return;
 
+    // get current Cell Info
     auto currentCell = m_base->shCtx.currentCell.get();
     Tai currentTai = Tai{currentCell.plmn, currentCell.tac};
 
@@ -114,7 +115,7 @@ void NasMm::performMmCycle()
         }
         else
         {
-            switchMmState(EMmSubState::MM_DEREGISTERED_PLMN_SEARCH);
+            switchMmState(EMmSubState::MM_DEREGISTERED_PLMN_SEARCH); // probably the initial substate
         }
         return;
     }

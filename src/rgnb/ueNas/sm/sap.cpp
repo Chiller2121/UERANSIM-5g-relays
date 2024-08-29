@@ -73,7 +73,7 @@ void NasSm::handleUplinkDataRequest(int psi, OctetString &&data)
         auto m = std::make_unique<NmUeNasToRls>(NmUeNasToRls::DATA_PDU_DELIVERY);
         m->psi = psi;
         m->pdu = std::move(data);
-        m_base->rlsTask->push(std::move(m));
+        m_base->ueRlsTask->push(std::move(m));
     }
     else
     {
@@ -101,7 +101,7 @@ void NasSm::handleDownlinkDataRequest(int psi, OctetString &&data)
     w->psi = psi;
     w->data = std::move(data);
 
-    m_base->appTask->push(std::move(w));
+    m_base->ueAppTask->push(std::move(w));
 }
 
 } // namespace nr::rgnb

@@ -25,12 +25,12 @@ class RGNodeB
     TaskBase *taskBase;
 
   public:
-    RGNodeB(RGnbGnbConfig *gnbConfig, RGnbUeConfig *ueConfig, app::IUeController *ueController, app::INodeListener *nodeListener, NtsTask *cliCallbackTask);
+    RGNodeB(RGnbGnbConfig *gnbConfig, RGnbUeConfig *ueConfig, app::IUeController *ueController, app::INodeListener *nodeListener); //, NtsTask *cliCallbackTask);
     virtual ~RGNodeB();
 
   public:
     void start();
-    void pushCommand(std::unique_ptr<app::GnbCliCommand> cmd, const InetAddress &address);
+//    void pushCommand(std::unique_ptr<app::GnbCliCommand> cmd, const InetAddress &address);
 };
 
 } // namespace nr::rgnb

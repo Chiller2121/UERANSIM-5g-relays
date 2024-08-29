@@ -13,7 +13,7 @@ namespace nr::rgnb
 
 NasSm::NasSm(TaskBase *base, NasTimers *timers) : m_base(base), m_timers(timers), m_mm(nullptr)
 {
-    m_logger = base->logBase->makeUniqueLogger(base->config->getLoggerPrefix() + "nas");
+    m_logger = base->logBase->makeUniqueLogger(base->ueConfig->getLoggerPrefix() + "nas");
 
     for (int i = 0; i < 16; i++)
         m_pduSessions[i] = new PduSession(i);

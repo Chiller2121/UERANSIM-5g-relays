@@ -196,7 +196,7 @@ EProcRc NasMm::sendNasMessage(const nas::PlainMmMessage &msg)
     auto m = std::make_unique<NmUeNasToRrc>(NmUeNasToRrc::UPLINK_NAS_DELIVERY);
     m->pduId = 0;
     m->nasPdu = std::move(pdu);
-    m_base->rrcTask->push(std::move(m));
+    m_base->ueRrcTask->push(std::move(m));
 
     return EProcRc::OK;
 }

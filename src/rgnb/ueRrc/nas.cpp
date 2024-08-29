@@ -67,7 +67,7 @@ void UeRrcTask::receiveDownlinkInformationTransfer(const ASN_RRC_DLInformationTr
 
     auto m = std::make_unique<NmUeRrcToNas>(NmUeRrcToNas::NAS_DELIVERY);
     m->nasPdu = std::move(nasPdu);
-    m_base->nasTask->push(std::move(m));
+    m_base->ueNasTask->push(std::move(m));
 }
 
 } // namespace nr::rgnb

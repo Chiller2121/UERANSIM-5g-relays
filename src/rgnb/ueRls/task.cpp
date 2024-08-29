@@ -19,13 +19,13 @@ namespace nr::rgnb
 
 UeRlsTask::UeRlsTask(TaskBase *base) : m_base{base}
 {
-    m_logger = m_base->logBase->makeUniqueLogger(m_base->config->getLoggerPrefix() + "rls");
+    m_logger = m_base->logBase->makeUniqueLogger(m_base->ueConfig->getLoggerPrefix() + "ueRls");
 
     m_shCtx = new RlsSharedContext();
-    m_shCtx->sti = Random::Mixed(base->config->getNodeName()).nextL();
+    m_shCtx->sti = Random::Mixed(base->ueConfig->getNodeName()).nextL();
 
-    m_udpTask = new RlsUdpTask(base, m_shCtx, base->config->gnbSearchList);
-    m_ctlTask = new RlsControlTask(base, m_shCtx);
+    m_udpTask = new UeRlsUdpTask(base, m_shCtx, base->ueConfig->gnbSearchList);
+    m_ctlTask = new UeRlsControlTask(base, m_shCtx);
 
     m_udpTask->initialize(m_ctlTask);
     m_ctlTask->initialize(this, m_udpTask);
@@ -53,14 +53,14 @@ void UeRlsTask::onLoop()
             auto m = std::make_unique<NmUeRlsToRrc>(NmUeRlsToRrc::SIGNAL_CHANGED);
             m->cellId = w.cellId;
             m->dbm = w.dbm;
-            m_base->rrcTask->push(std::move(m));
+            m_base->ueRrcTask->push(std::move(m));
             break;
         }
         case NmUeRlsToRls::DOWNLINK_DATA: {
             auto m = std::make_unique<NmUeRlsToNas>(NmUeRlsToNas::DATA_PDU_DELIVERY);
             m->psi = w.psi;
             m->pdu = std::move(w.data);
-            m_base->nasTask->push(std::move(m));
+            m_base->ueNasTask->push(std::move(m));
             break;
         }
         case NmUeRlsToRls::DOWNLINK_RRC: {
@@ -68,13 +68,13 @@ void UeRlsTask::onLoop()
             m->cellId = w.cellId;
             m->channel = w.rrcChannel;
             m->pdu = std::move(w.data);
-            m_base->rrcTask->push(std::move(m));
+            m_base->ueRrcTask->push(std::move(m));
             break;
         }
         case NmUeRlsToRls::RADIO_LINK_FAILURE: {
             auto m = std::make_unique<NmUeRlsToRrc>(NmUeRlsToRrc::RADIO_LINK_FAILURE);
             m->rlfCause = w.rlfCause;
-            m_base->rrcTask->push(std::move(m));
+            m_base->ueRrcTask->push(std::move(m));
             break;
         }
         case NmUeRlsToRls::TRANSMISSION_FAILURE: {
@@ -108,7 +108,7 @@ void UeRlsTask::onLoop()
             break;
         }
         case NmUeRrcToRls::RESET_STI: {
-            m_shCtx->sti = Random::Mixed(m_base->config->getNodeName()).nextL();
+            m_shCtx->sti = Random::Mixed(m_base->ueConfig->getNodeName()).nextL();
             break;
         }
         }

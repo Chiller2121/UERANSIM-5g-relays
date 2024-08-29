@@ -45,7 +45,7 @@ void UeRrcTask::switchState(ERrcState state)
 
     if (m_base->nodeListener)
     {
-        m_base->nodeListener->onSwitch(app::NodeType::UE, m_base->config->getNodeName(), app::StateType::RRC,
+        m_base->nodeListener->onSwitch(app::NodeType::UE, m_base->ueConfig->getNodeName(), app::StateType::RRC,
                                        ToJson(oldState).str(), ToJson(state).str());
     }
 

@@ -41,7 +41,7 @@ void NasSm::localReleaseSession(int psi)
     {
         auto statusUpdate = std::make_unique<NmUeStatusUpdate>(NmUeStatusUpdate::SESSION_RELEASE);
         statusUpdate->psi = psi;
-        m_base->appTask->push(std::move(statusUpdate));
+        m_base->ueAppTask->push(std::move(statusUpdate));
     }
 }
 
@@ -125,7 +125,7 @@ void NasSm::establishRequiredSessions()
         return;
     }
 
-    for (auto &config : m_base->config->defaultSessions)
+    for (auto &config : m_base->ueConfig->defaultSessions)
     {
         if (!anySessionMatches(config))
             sendEstablishmentRequest(config);

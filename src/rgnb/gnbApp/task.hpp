@@ -26,7 +26,7 @@ class GnbAppTask : public NtsTask
     TaskBase *m_base;
     std::unique_ptr<Logger> m_logger;
 
-    GnbStatusInfo m_statusInfo;
+    RGnbStatusInfo m_statusInfo;
 
     friend class GnbCmdHandler;
 

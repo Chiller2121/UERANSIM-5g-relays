@@ -20,24 +20,25 @@
 #include "ueNas/task.hpp"
 #include "ueApp/task.hpp"
 
-#include <lib/app/cli_base.hpp>
+//#include <lib/app/cli_base.hpp>
 
 namespace nr::rgnb
 {
 
-RGNodeB::RGNodeB(RGnbGnbConfig *gnbConfig, RGnbUeConfig *ueConfig, app::IUeController *ueController, app::INodeListener *nodeListener, NtsTask *cliCallbackTask)
+RGNodeB::RGNodeB(RGnbGnbConfig *gnbConfig, RGnbUeConfig *ueConfig, app::IUeController *ueController, app::INodeListener *nodeListener) // NtsTask *cliCallbackTask)
 {
     auto *base = new TaskBase();
 
     base->gnbConfig = gnbConfig;
     base->ueConfig = ueConfig;
+    base->rgnb = this;
 
-    base->logBase = new LogBase("logs/" + config->name + ".log");
+    base->logBase = new LogBase("logs/" + gnbConfig->name + ".log");
     base->nodeListener = nodeListener;
-    base->cliCallbackTask = cliCallbackTask;
+//    base->cliCallbackTask = cliCallbackTask;
 
     // gNB Part Tasks
-    base->gnbAppTask = new GnbAppTask(base);    // TODO: Can gNB and UE Part share an AppTask?
+    base->gnbAppTask = new GnbAppTask(base);
     base->gnbSctpTask = new SctpTask(base);
     base->gnbNgapTask = new NgapTask(base);
     base->gnbRrcTask = new GnbRrcTask(base);
@@ -50,7 +51,7 @@ RGNodeB::RGNodeB(RGnbGnbConfig *gnbConfig, RGnbUeConfig *ueConfig, app::IUeContr
     base->ueNasTask = new NasTask(base);
     base->ueRlsTask = new UeRlsTask(base);
 
-    base->ueController = ueController; // TODO: what is this used for?
+    base->ueController = ueController;
 
     taskBase = base;
 }
@@ -102,9 +103,9 @@ void RGNodeB::start()
 
 }
 
-void RGNodeB::pushCommand(std::unique_ptr<app::RGnbCliCommand> cmd, const InetAddress &address) // TODO: deal with commands for different parts of the RGNodeB
-{
-    taskBase->appTask->push(std::make_unique<NmGnbCliCommand>(std::move(cmd), address));
-}
+//void RGNodeB::pushCommand(std::unique_ptr<app::RGnbCliCommand> cmd, const InetAddress &address)
+//{
+//    taskBase->appTask->push(std::make_unique<NmGnbCliCommand>(std::move(cmd), address));
+//}
 
 } // namespace nr::rgnb

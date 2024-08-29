@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(ueransim)
+project(ueransim-5g-relays)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
@@ -18,24 +18,22 @@ add_subdirectory(src/gnb)
 add_subdirectory(src/ue)
 add_subdirectory(src/rgnb)
 
-#################### GNB EXECUTABLE ####################
-
-add_executable(nr-gnb src/gnb.cpp)
-
-target_link_libraries(nr-gnb pthread)
-
-target_compile_options(nr-gnb PRIVATE -Wall -Wextra -pedantic)
-
-target_link_libraries(nr-gnb asn-rrc)
-target_link_libraries(nr-gnb asn-ngap)
-target_link_libraries(nr-gnb common-lib)
-target_link_libraries(nr-gnb gnb)
+##################### GNB EXECUTABLE ####################
+#
+#add_executable(nr-gnb src/gnb.cpp)
+#
+#target_link_libraries(nr-gnb pthread)
+#
+#target_compile_options(nr-gnb PRIVATE -Wall -Wextra -pedantic)
+#
+#target_link_libraries(nr-gnb asn-rrc)
+#target_link_libraries(nr-gnb asn-ngap)
+#target_link_libraries(nr-gnb common-lib)
+#target_link_libraries(nr-gnb gnb)
 
 #################### RGNB EXECUTABLE ###################
 
-add_executable(nr-rgnb src/rgnb.cpp
-        src/rgnb.cpp
-        src/rgnb.cpp)
+add_executable(nr-rgnb src/rgnb.cpp)
 
 target_link_libraries(nr-rgnb pthread)
 
@@ -46,14 +44,14 @@ target_link_libraries(nr-rgnb asn-ngap)
 target_link_libraries(nr-rgnb common-lib)
 target_link_libraries(nr-rgnb rgnb)
 
-#################### UE EXECUTABLE ####################
-
-add_executable(nr-ue src/ue.cpp)
-target_link_libraries(nr-ue pthread)
-target_compile_options(nr-ue PRIVATE -Wall -Wextra -pedantic)
-
-target_link_libraries(nr-ue common-lib)
-target_link_libraries(nr-ue ue)
+##################### UE EXECUTABLE ####################
+#
+#add_executable(nr-ue src/ue.cpp)
+#target_link_libraries(nr-ue pthread)
+#target_compile_options(nr-ue PRIVATE -Wall -Wextra -pedantic)
+#
+#target_link_libraries(nr-ue common-lib)
+#target_link_libraries(nr-ue ue)
 
 ###################### IF BINDER ######################
 add_library(devbnd SHARED src/binder.cpp)
