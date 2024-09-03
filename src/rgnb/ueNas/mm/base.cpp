@@ -56,7 +56,7 @@ static EMmState GetMmStateFromSubState(EMmSubState subState)
 
 NasMm::NasMm(TaskBase *base, NasTimers *timers) : m_base{base}, m_timers{timers}, m_sm{}, m_usim{}, m_procCtl{}
 {
-    m_logger = base->logBase->makeUniqueLogger(base->ueConfig->getLoggerPrefix() + "nas");
+    m_logger = base->logBase->makeUniqueLogger(base->ueConfig->getLoggerPrefix() + "ueNas");
 
     m_rmState = ERmState::RM_DEREGISTERED;
     m_cmState = ECmState::CM_IDLE;

@@ -72,12 +72,14 @@ void NasMm::receiveAuthenticationRequestEap(const nas::AuthenticationRequest &ms
 
     if (!msg.eapMessage.has_value())
     {
+        m_logger->debug("Semantically incorrect message 1");
         sendMmStatus(nas::EMmCause::SEMANTICALLY_INCORRECT_MESSAGE);
         return;
     }
 
     if (msg.eapMessage->eap->eapType != eap::EEapType::EAP_AKA_PRIME)
     {
+        m_logger->debug("Semantically incorrect message 2");
         sendMmStatus(nas::EMmCause::SEMANTICALLY_INCORRECT_MESSAGE);
         return;
     }
@@ -86,6 +88,7 @@ void NasMm::receiveAuthenticationRequestEap(const nas::AuthenticationRequest &ms
 
     if (receivedEap.subType != eap::ESubType::AKA_CHALLENGE)
     {
+        m_logger->debug("Semantically incorrect message 3");
         sendMmStatus(nas::EMmCause::SEMANTICALLY_INCORRECT_MESSAGE);
         return;
     }
@@ -98,6 +101,7 @@ void NasMm::receiveAuthenticationRequestEap(const nas::AuthenticationRequest &ms
 
     if (receivedRand.length() != 16 || receivedAutn.length() != 16 || receivedMac.length() != 16)
     {
+        m_logger->debug("Semantically incorrect message 4");
         sendMmStatus(nas::EMmCause::SEMANTICALLY_INCORRECT_MESSAGE);
         return;
     }
@@ -295,12 +299,14 @@ void NasMm::receiveAuthenticationRequest5gAka(const nas::AuthenticationRequest &
 
     if (!msg.authParamRAND.has_value() || !msg.authParamAUTN.has_value())
     {
+        m_logger->debug("Semantically incorrect message 5");
         sendFailure(nas::EMmCause::SEMANTICALLY_INCORRECT_MESSAGE);
         return;
     }
 
     if (msg.authParamRAND->value.length() != 16 || msg.authParamAUTN->value.length() != 16)
     {
+        m_logger->debug("Semantically incorrect message 6");
         sendFailure(nas::EMmCause::SEMANTICALLY_INCORRECT_MESSAGE);
         return;
     }

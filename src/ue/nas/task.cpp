@@ -19,7 +19,7 @@ namespace nr::ue
 
 NasTask::NasTask(TaskBase *base) : base{base}, timers{}
 {
-    logger = base->logBase->makeUniqueLogger(base->config->getLoggerPrefix() + "ueNas");
+    logger = base->logBase->makeUniqueLogger(base->config->getLoggerPrefix() + "nas");
 
     mm = new NasMm(base, &timers);
     sm = new NasSm(base, &timers);
