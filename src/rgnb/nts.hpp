@@ -638,5 +638,33 @@ struct NmUeCliCommand : NtsMessage
     }
 };
 
+// RGNB specific messages
+
+struct NmRgnbRrcToRrc : NtsMessage // equivalent of NmGnbRrcToNgap
+{
+    enum PR
+    {
+        INITIAL_NAS_DELIVERY,
+        UPLINK_NAS_DELIVERY,
+        DOWNLINK_NAS_DELIVERY,
+    } present;
+
+    // INITIAL_NAS_DELIVERY
+    // UPLINK_NAS_DELIVERY
+    // DOWNLINK_NAS_DELIVERY
+    int ueId{};
+
+    // INITIAL_NAS_DELIVERY
+    // UPLINK_NAS_DELIVERY
+    OctetString pdu{};
+
+    // INITIAL_NAS_DELIVERY
+    int64_t rrcEstablishmentCause{};
+    std::optional<GutiMobileIdentity> sTmsi{};
+
+    explicit NmRgnbRrcToRrc(PR present) : NtsMessage(NtsMessageType::RGNB_RRC_TO_RRC), present(present)
+    {
+    }
+};
 
 } // namespace nr::rgnb

@@ -55,6 +55,9 @@ class UeRrcTask : public NtsTask
     ERrcState m_state;
     RrcTimers m_timers;
 
+    /* RGNB related */
+    int ngapUeId{};
+
     /* Cell and PLMN related */
     std::unordered_map<int, UeCellDesc> m_cellDesc{};
     int64_t m_lastTimePlmnSearchFailureLogged{};
@@ -96,6 +99,7 @@ class UeRrcTask : public NtsTask
     /* Service Access Point */
     void handleRlsSapMessage(NmUeRlsToRrc &msg);
     void handleNasSapMessage(NmUeNasToRrc &msg);
+    void handleRrcSapMessage(NmRgnbRrcToRrc &msg);
 
     /* State Management */
     void triggerCycle();

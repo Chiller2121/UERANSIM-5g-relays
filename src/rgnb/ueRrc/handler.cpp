@@ -9,7 +9,6 @@
 #include "task.hpp"
 #include <lib/asn/utils.hpp>
 #include <lib/rrc/encode.hpp>
-#include <rgnb/ueNas/task.hpp>
 #include <rgnb/nts.hpp>
 #include <utils/common.hpp>
 
@@ -53,7 +52,7 @@ void UeRrcTask::receivePaging(const ASN_RRC_Paging &msg)
 
     auto w = std::make_unique<NmUeRrcToNas>(NmUeRrcToNas::PAGING);
     w->pagingTmsi = std::move(tmsiIds);
-    m_base->ueNasTask->push(std::move(w));
+//    m_base->ueNasTask->push(std::move(w)); //TODO: this needs to be forwarded to the RGNB GNB component
 }
 
 } // namespace nr::rgnb

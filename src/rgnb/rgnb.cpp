@@ -17,8 +17,6 @@
 
 #include "ueRls/task.hpp"
 #include "ueRrc/task.hpp"
-#include "ueNas/task.hpp"
-#include "ueApp/task.hpp"
 
 //#include <lib/app/cli_base.hpp>
 
@@ -37,6 +35,10 @@ RGNodeB::RGNodeB(RGnbGnbConfig *gnbConfig, RGnbUeConfig *ueConfig, app::IUeContr
     base->nodeListener = nodeListener;
 //    base->cliCallbackTask = cliCallbackTask;
 
+    // UE Part Tasks
+    base->ueRrcTask = new UeRrcTask(base);
+    base->ueRlsTask = new UeRlsTask(base);
+
     // gNB Part Tasks
     base->gnbAppTask = new GnbAppTask(base);
     base->gnbSctpTask = new SctpTask(base);
@@ -45,12 +47,6 @@ RGNodeB::RGNodeB(RGnbGnbConfig *gnbConfig, RGnbUeConfig *ueConfig, app::IUeContr
     base->gnbGtpTask = new GtpTask(base);
     base->gnbRlsTask = new GnbRlsTask(base);
 
-    // UE Part Tasks
-    base->ueAppTask = new UeAppTask(base);
-    base->ueRrcTask = new UeRrcTask(base);
-    base->ueNasTask = new NasTask(base);
-    base->ueRlsTask = new UeRlsTask(base);
-
     base->ueController = ueController;
 
     taskBase = base;
@@ -58,6 +54,9 @@ RGNodeB::RGNodeB(RGnbGnbConfig *gnbConfig, RGnbUeConfig *ueConfig, app::IUeContr
 
 RGNodeB::~RGNodeB()
 {
+    taskBase->ueRrcTask->quit();
+    taskBase->ueRlsTask->quit();
+
     taskBase->gnbAppTask->quit();
     taskBase->gnbSctpTask->quit();
     taskBase->gnbNgapTask->quit();
@@ -65,10 +64,8 @@ RGNodeB::~RGNodeB()
     taskBase->gnbGtpTask->quit();
     taskBase->gnbRlsTask->quit();
 
-    taskBase->ueNasTask->quit();
-    taskBase->ueRrcTask->quit();
-    taskBase->ueRlsTask->quit();
-    taskBase->ueAppTask->quit();
+    delete taskBase->ueRrcTask;
+    delete taskBase->ueRlsTask;
 
     delete taskBase->gnbAppTask;
     delete taskBase->gnbSctpTask;
@@ -77,30 +74,21 @@ RGNodeB::~RGNodeB()
     delete taskBase->gnbGtpTask;
     delete taskBase->gnbRlsTask;
 
-    delete taskBase->ueNasTask;
-    delete taskBase->ueRrcTask;
-    delete taskBase->ueRlsTask;
-    delete taskBase->ueAppTask;
-
     delete taskBase->logBase;
-
     delete taskBase;
 }
 
 void RGNodeB::start()
 {
+    taskBase->ueRrcTask->start();
+    taskBase->ueRlsTask->start();
+
     taskBase->gnbAppTask->start();
     taskBase->gnbSctpTask->start();
     taskBase->gnbNgapTask->start();
     taskBase->gnbRrcTask->start();
     taskBase->gnbRlsTask->start();
     taskBase->gnbGtpTask->start();
-
-    taskBase->ueNasTask->start();
-    taskBase->ueRrcTask->start();
-    taskBase->ueRlsTask->start();
-    taskBase->ueAppTask->start();
-
 }
 
 //void RGNodeB::pushCommand(std::unique_ptr<app::RGnbCliCommand> cmd, const InetAddress &address)

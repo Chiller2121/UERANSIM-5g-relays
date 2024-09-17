@@ -8,6 +8,7 @@
 
 #include "task.hpp"
 
+#include <rgnb/ueRrc/task.hpp>
 #include <rgnb/gnbNgap/task.hpp>
 #include <lib/rrc/encode.hpp>
 
@@ -122,14 +123,21 @@ void GnbRrcTask::receiveRrcSetupComplete(int ueId, const ASN_RRC_RRCSetupComplet
             }
         }
     }
+    // TODO: if rgnb forward
+        auto w = std::make_unique<NmRgnbRrcToRrc>(NmRgnbRrcToRrc::INITIAL_NAS_DELIVERY);
+        w->ueId = ueId;
+        w->pdu = asn::GetOctetString(setupComplete->dedicatedNAS_Message);
+        w->rrcEstablishmentCause = ue->establishmentCause;
+        w->sTmsi = ue->sTmsi;
+        m_base->ueRrcTask->push(std::move(w));
 
-    auto w = std::make_unique<NmGnbRrcToNgap>(NmGnbRrcToNgap::INITIAL_NAS_DELIVERY);
-    w->ueId = ueId;
-    w->pdu = asn::GetOctetString(setupComplete->dedicatedNAS_Message);
-    w->rrcEstablishmentCause = ue->establishmentCause;
-    w->sTmsi = ue->sTmsi;
-
-    m_base->gnbNgapTask->push(std::move(w));
+    // TODO: if last hop in relay chain:
+//    auto w = std::make_unique<NmGnbRrcToNgap>(NmGnbRrcToNgap::INITIAL_NAS_DELIVERY);
+//    w->ueId = ueId;
+//    w->pdu = asn::GetOctetString(setupComplete->dedicatedNAS_Message);
+//    w->rrcEstablishmentCause = ue->establishmentCause;
+//    w->sTmsi = ue->sTmsi;
+//    m_base->gnbNgapTask->push(std::move(w));
 }
 
 } // namespace nr::rgnb

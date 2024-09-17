@@ -8,8 +8,6 @@
 
 #include "task.hpp"
 
-#include <rgnb/ueApp/task.hpp>
-#include <rgnb/ueNas/task.hpp>
 #include <rgnb/ueRrc/task.hpp>
 #include <utils/common.hpp>
 #include <utils/random.hpp>
@@ -60,7 +58,7 @@ void UeRlsTask::onLoop()
             auto m = std::make_unique<NmUeRlsToNas>(NmUeRlsToNas::DATA_PDU_DELIVERY);
             m->psi = w.psi;
             m->pdu = std::move(w.data);
-            m_base->ueNasTask->push(std::move(m));
+//            m_base->ueNasTask->push(std::move(m)); // TODO: needs to be sent to RGNB GNB part instead
             break;
         }
         case NmUeRlsToRls::DOWNLINK_RRC: {
@@ -118,7 +116,7 @@ void UeRlsTask::onLoop()
         auto &w = dynamic_cast<NmUeNasToRls &>(*msg);
         switch (w.present)
         {
-        case NmUeNasToRls::DATA_PDU_DELIVERY: {
+        case NmUeNasToRls::DATA_PDU_DELIVERY: { // TODO: will be received from RGNB GNB part instead
             auto m = std::make_unique<NmUeRlsToRls>(NmUeRlsToRls::UPLINK_DATA);
             m->psi = w.psi;
             m->data = std::move(w.pdu);

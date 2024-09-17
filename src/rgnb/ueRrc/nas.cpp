@@ -9,7 +9,7 @@
 #include "task.hpp"
 
 #include <lib/rrc/encode.hpp>
-#include <rgnb/ueNas/task.hpp>
+#include <rgnb/gnbRrc/task.hpp>
 #include <rgnb/nts.hpp>
 
 #include <asn/rrc/ASN_RRC_DLInformationTransfer-IEs.h>
@@ -65,9 +65,17 @@ void UeRrcTask::receiveDownlinkInformationTransfer(const ASN_RRC_DLInformationTr
     OctetString nasPdu =
         asn::GetOctetString(*msg.criticalExtensions.choice.dlInformationTransfer->dedicatedNAS_Message);
 
-    auto m = std::make_unique<NmUeRrcToNas>(NmUeRrcToNas::NAS_DELIVERY);
-    m->nasPdu = std::move(nasPdu);
-    m_base->ueNasTask->push(std::move(m));
+    // TODO: forward to RGNB-GNB part
+    auto m = std::make_unique<NmRgnbRrcToRrc>(NmRgnbRrcToRrc::DOWNLINK_NAS_DELIVERY);
+    m->pdu = std::move(nasPdu);
+    m->ueId = ngapUeId;
+    m_base->gnbRrcTask->push(std::move(m));
+    m_logger->info("Forwarded downlink RGNB NAS message");
+
+
+//    auto m = std::make_unique<NmUeRrcToNas>(NmUeRrcToNas::NAS_DELIVERY);
+//    m->nasPdu = std::move(nasPdu);
+//    m_base->ueNasTask->push(std::move(m)); // TODO: needs to be sent to the RGNB-GNB part instead
 }
 
 } // namespace nr::rgnb

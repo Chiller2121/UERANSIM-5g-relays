@@ -11,7 +11,6 @@
 #include <algorithm>
 
 #include <lib/rrc/encode.hpp>
-#include <rgnb/ueNas/task.hpp>
 #include <rgnb/ueRls/task.hpp>
 
 namespace nr::rgnb
@@ -109,7 +108,7 @@ void UeRrcTask::performCellSelection()
 
         auto w2 = std::make_unique<NmUeRrcToNas>(NmUeRrcToNas::ACTIVE_CELL_CHANGED);
         w2->previousTai = Tai{lastCell.plmn, lastCell.tac};
-        m_base->ueNasTask->push(std::move(w2));
+//        m_base->ueNasTask->push(std::move(w2)); // TODO: if it is more than a notification, this needs to be handled
     }
 }
 

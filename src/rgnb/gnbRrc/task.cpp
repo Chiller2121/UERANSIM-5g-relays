@@ -72,6 +72,25 @@ void GnbRrcTask::onLoop()
         }
         break;
     }
+    case NtsMessageType::RGNB_RRC_TO_RRC: {
+        auto &w = dynamic_cast<NmRgnbRrcToRrc &>(*msg);
+        switch (w.present)
+        {
+        case NmRgnbRrcToRrc::DOWNLINK_NAS_DELIVERY: {
+            handleDownlinkNasDelivery(w.ueId, w.pdu);
+            break;
+        }
+        case NmRgnbRrcToRrc::INITIAL_NAS_DELIVERY: {
+            // TODO:
+            break;
+        }
+        case NmRgnbRrcToRrc::UPLINK_NAS_DELIVERY:  {
+            // TODO
+            break;
+        }
+        }
+        break;
+    }
     case NtsMessageType::TIMER_EXPIRED: {
         auto w = dynamic_cast<NmTimerExpired &>(*msg);
         if (w.timerId == TIMER_ID_SI_BROADCAST)

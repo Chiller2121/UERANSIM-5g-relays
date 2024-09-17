@@ -9,7 +9,6 @@
 #include "task.hpp"
 
 #include <lib/rrc/encode.hpp>
-#include <rgnb/ueNas/task.hpp>
 #include <rgnb/nts.hpp>
 #include <rgnb/ueRls/task.hpp>
 
@@ -49,7 +48,7 @@ void UeRrcTask::handleNasSapMessage(NmUeNasToRrc &msg)
 
         switchState(ERrcState::RRC_IDLE);
         m_base->ueRlsTask->push(std::make_unique<NmUeRrcToRls>(NmUeRrcToRls::RESET_STI));
-        m_base->ueNasTask->push(std::make_unique<NmUeRrcToNas>(NmUeRrcToNas::RRC_CONNECTION_RELEASE));
+//        m_base->ueNasTask->push(std::make_unique<NmUeRrcToNas>(NmUeRrcToNas::RRC_CONNECTION_RELEASE)); // TODO: if it is more than a notification, this needs to be handled
         break;
     }
     case NmUeNasToRrc::RRC_NOTIFY: {
@@ -63,5 +62,37 @@ void UeRrcTask::handleNasSapMessage(NmUeNasToRrc &msg)
     }
     }
 }
+
+void UeRrcTask::handleRrcSapMessage(nr::rgnb::NmRgnbRrcToRrc &msg)
+{
+    switch (msg.present)
+    {
+    case NmRgnbRrcToRrc::INITIAL_NAS_DELIVERY: {
+        ngapUeId = msg.ueId;
+        deliverUplinkNas(0, std::move(msg.pdu)); // TODO: Not sure what the pduId is used for?
+        break;
+    }
+    case NmRgnbRrcToRrc::UPLINK_NAS_DELIVERY: {
+        deliverUplinkNas(0, std::move(msg.pdu));
+        break;
+    }
+    case NmRgnbRrcToRrc::DOWNLINK_NAS_DELIVERY: {
+        // TODO
+        break;
+    }
+    }
+}
+
+//void UeRrcTask::handleNgapSapMessage(NmRgnbNgapToRrc &msg)
+//{
+//    switch (msg.present)
+//    {
+//    case NmRgnbNgapToRrc::UPLINK_NAS_DELIVERY: {
+//        ngapUeId = msg.ueId;
+//        deliverUplinkNas(msg.pduId, std::move(msg.nasPdu));
+//        break;
+//    }
+//    }
+//}
 
 } // namespace nr::rgnb

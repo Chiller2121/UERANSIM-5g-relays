@@ -11,7 +11,6 @@
 #include <lib/asn/rrc.hpp>
 #include <lib/asn/utils.hpp>
 #include <lib/rrc/encode.hpp>
-#include <rgnb/ueNas/task.hpp>
 
 #include <asn/rrc/ASN_RRC_MIB.h>
 #include <asn/rrc/ASN_RRC_PLMN-IdentityInfo.h>

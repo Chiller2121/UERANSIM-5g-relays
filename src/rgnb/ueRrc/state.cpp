@@ -11,7 +11,6 @@
 #include <lib/asn/rrc.hpp>
 #include <lib/asn/utils.hpp>
 #include <lib/rrc/encode.hpp>
-#include <rgnb/ueNas/task.hpp>
 
 namespace nr::rgnb
 {

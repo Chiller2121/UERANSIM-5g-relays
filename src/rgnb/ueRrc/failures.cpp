@@ -9,7 +9,6 @@
 #include "task.hpp"
 
 #include <lib/rrc/encode.hpp>
-#include <rgnb/ueNas/task.hpp>
 #include <rgnb/nts.hpp>
 
 namespace nr::rgnb
@@ -23,7 +22,7 @@ void UeRrcTask::declareRadioLinkFailure(rls::ERlfCause cause)
 void UeRrcTask::handleRadioLinkFailure(rls::ERlfCause cause)
 {
     m_state = ERrcState::RRC_IDLE;
-    m_base->ueNasTask->push(std::make_unique<NmUeRrcToNas>(NmUeRrcToNas::RADIO_LINK_FAILURE));
+//    m_base->ueNasTask->push(std::make_unique<NmUeRrcToNas>(NmUeRrcToNas::RADIO_LINK_FAILURE)); // TODO: if it is more than a notification, this needs to be handled
 }
 
 } // namespace nr::rgnb

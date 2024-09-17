@@ -9,7 +9,6 @@
 #include "task.hpp"
 
 #include <lib/rrc/encode.hpp>
-#include <rgnb/ueNas/task.hpp>
 
 namespace nr::rgnb
 {
@@ -72,7 +71,7 @@ void UeRrcTask::notifyCellLost(int cellId)
         {
             auto w = std::make_unique<NmUeRrcToNas>(NmUeRrcToNas::ACTIVE_CELL_CHANGED);
             w->previousTai = Tai{lastActiveCell.plmn, lastActiveCell.tac};
-            m_base->ueNasTask->push(std::move(w));
+//            m_base->ueNasTask->push(std::move(w)); // TODO: if it is more than a notification, this needs to be handled
         }
     }
 
@@ -98,7 +97,7 @@ void UeRrcTask::updateAvailablePlmns()
                 value.insert(cellDesc.second.sib1.plmn);
     });
 
-    m_base->ueNasTask->push(std::make_unique<NmUeRrcToNas>(NmUeRrcToNas::NAS_NOTIFY));
+//    m_base->ueNasTask->push(std::make_unique<NmUeRrcToNas>(NmUeRrcToNas::NAS_NOTIFY)); // TODO: if it is more than a notification, this needs to be handled
 }
 
 } // namespace nr::rgnb

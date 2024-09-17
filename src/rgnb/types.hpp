@@ -48,8 +48,8 @@ class GnbRlsTask;
 class SctpTask;
 
 // UE classes
-class UeAppTask;
-class NasTask;
+//class UeAppTask;
+//class NasTask;
 class UeRrcTask;
 class UeRlsTask;
 class RGNodeB;
@@ -881,7 +881,7 @@ enum class ENasTransportHint
 struct RGnbUeConfig //copied from ue/types.hpp
 {
     /* Read from config file */
-    std::optional<Supi> supi{};
+    std::optional<Supi> supi{}; // TODO: ideally not required
     int protectionScheme;
     int homeNetworkPublicKeyId;
     OctetString homeNetworkPublicKey{};
@@ -971,9 +971,7 @@ struct TaskBase // modified to include both the UE and the gNB parts of the rGNB
     GnbRlsTask *gnbRlsTask{};
 
     // UE Part
-    UeAppTask *ueAppTask{};
     UeRrcTask *ueRrcTask{};
-    NasTask *ueNasTask{};
     UeRlsTask *ueRlsTask{};
 };
 

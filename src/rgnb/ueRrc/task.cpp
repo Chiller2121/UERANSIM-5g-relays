@@ -12,8 +12,6 @@
 #include <asn/rrc/ASN_RRC_ULInformationTransfer-IEs.h>
 #include <asn/rrc/ASN_RRC_ULInformationTransfer.h>
 #include <lib/rrc/encode.hpp>
-#include <rgnb/ueApp/task.hpp>
-#include <rgnb/ueNas/task.hpp>
 #include <rgnb/ueRls/task.hpp>
 #include <utils/common.hpp>
 
@@ -52,6 +50,14 @@ void UeRrcTask::onLoop()
 
     switch (msg->msgType)
     {
+//    case NtsMessageType::RGNB_NGAP_TO_RRC: {
+//        handleNgapSapMessage(dynamic_cast<NmRgnbNgapToRrc &>(*msg));
+//        break;
+//    }
+    case NtsMessageType::RGNB_RRC_TO_RRC: {
+        handleRrcSapMessage(dynamic_cast<NmRgnbRrcToRrc &>(*msg));
+        break;
+    }
     case NtsMessageType::UE_NAS_TO_RRC: {
         handleNasSapMessage(dynamic_cast<NmUeNasToRrc &>(*msg));
         break;

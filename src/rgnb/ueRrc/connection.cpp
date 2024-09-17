@@ -9,7 +9,6 @@
 #include "task.hpp"
 
 #include <lib/rrc/encode.hpp>
-#include <rgnb/ueNas/task.hpp>
 #include <rgnb/nts.hpp>
 #include <utils/random.hpp>
 
@@ -130,7 +129,7 @@ void UeRrcTask::receiveRrcSetup(int cellId, const ASN_RRC_RRCSetup &msg)
 
     m_logger->info("RRC connection established");
     switchState(ERrcState::RRC_CONNECTED);
-    m_base->ueNasTask->push(std::make_unique<NmUeRrcToNas>(NmUeRrcToNas::RRC_CONNECTION_SETUP));
+//    m_base->ueNasTask->push(std::make_unique<NmUeRrcToNas>(NmUeRrcToNas::RRC_CONNECTION_SETUP)); // TODO: if it is more than a notification, this needs to be handled
 }
 
 void UeRrcTask::receiveRrcReject(int cellId, const ASN_RRC_RRCReject &msg)
@@ -147,12 +146,12 @@ void UeRrcTask::receiveRrcRelease(const ASN_RRC_RRCRelease &msg)
 {
     m_logger->debug("RRC Release received");
     m_state = ERrcState::RRC_IDLE;
-    m_base->ueNasTask->push(std::make_unique<NmUeRrcToNas>(NmUeRrcToNas::RRC_CONNECTION_RELEASE));
+//    m_base->ueNasTask->push(std::make_unique<NmUeRrcToNas>(NmUeRrcToNas::RRC_CONNECTION_RELEASE)); // TODO: if it is more than a notification, this needs to be handled
 }
 
 void UeRrcTask::handleEstablishmentFailure()
 {
-    m_base->ueNasTask->push(std::make_unique<NmUeRrcToNas>(NmUeRrcToNas::RRC_ESTABLISHMENT_FAILURE));
+//    m_base->ueNasTask->push(std::make_unique<NmUeRrcToNas>(NmUeRrcToNas::RRC_ESTABLISHMENT_FAILURE)); // TODO: if it is more than a notification, this needs to be handled
 }
 
 } // namespace nr::rgnb

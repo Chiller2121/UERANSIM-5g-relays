@@ -9,6 +9,7 @@
 #include "task.hpp"
 
 #include <rgnb/gnbNgap/task.hpp>
+#include <rgnb/ueRrc/task.hpp>
 #include <lib/rrc/encode.hpp>
 
 #include <asn/ngap/ASN_NGAP_FiveG-S-TMSI.h>
@@ -60,10 +61,18 @@ void GnbRrcTask::handleDownlinkNasDelivery(int ueId, const OctetString &nasPdu)
 
 void GnbRrcTask::deliverUplinkNas(int ueId, OctetString &&nasPdu)
 {
-    auto w = std::make_unique<NmGnbRrcToNgap>(NmGnbRrcToNgap::UPLINK_NAS_DELIVERY);
+    // TODO: if RGNB forward
+    auto w = std::make_unique<NmRgnbRrcToRrc>(NmRgnbRrcToRrc::UPLINK_NAS_DELIVERY);
     w->ueId = ueId;
     w->pdu = std::move(nasPdu);
-    m_base->gnbNgapTask->push(std::move(w));
+    m_base->ueRrcTask->push(std::move(w));
+    m_logger->info("Forwarded uplink RGNB NAS message");
+
+    // TODO: if last hop in relay chain
+//    auto w = std::make_unique<NmGnbRrcToNgap>(NmGnbRrcToNgap::UPLINK_NAS_DELIVERY);
+//    w->ueId = ueId;
+//    w->pdu = std::move(nasPdu);
+//    m_base->gnbNgapTask->push(std::move(w));
 }
 
 void GnbRrcTask::receiveUplinkInformationTransfer(int ueId, const ASN_RRC_ULInformationTransfer &msg)
